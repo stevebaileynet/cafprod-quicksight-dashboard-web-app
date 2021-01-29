@@ -23,6 +23,7 @@
     - [Web Client Development Cycle](#web-client-development-cycle)
     - [Web Client Language Locale Support](#web-client-language-locale-support)
     - [Deploy the Web Client](#deploy-the-web-client)
+  - [Add Security Headers using Lambda@Edge Function](#add-security-headers-using-lambdaedge-function)
   - [Testing and Troubleshooting](#testing-and-troubleshooting)
     - [AWS-Amplify "API not configured" Error](#aws-amplify-api-not-configured-error)
     - [No 'Access-Control-Allow-Origin' header is present on the requested resource](#no-access-control-allow-origin-header-is-present-on-the-requested-resource)
@@ -611,6 +612,38 @@ find src -type file -name "*.js" | xargs grep 'I18n.get' | cut -d{ -f2 | cut -d\
 ### Deploy the Web Client
 
 Copy the contents of the build directory to S3
+
+## Add Security Headers using Lambda@Edge Function
+
+Reference: [Adding HTTP Security Headers Using Lambda@Edge and Amazon CloudFront](https://aws.amazon.com/blogs/networking-and-content-delivery/adding-http-security-headers-using-lambdaedge-and-amazon-cloudfront/)
+
+Rules for CloudFront Triggers for Lambda Functions:
+
+- You can add triggers only for functions in the US East (N. Virginia) Region.
+- You can add triggers only for a numbered version, not for $LATEST or for aliases. Publish the $LATEST changes to your Lambda to create a new numbered version.
+- To add triggers, the IAM execution role associated with your Lambda function must be assumable by the service principals lambda.amazonaws.com and edgelambda.amazonaws.com. For more information, Setting IAM Permissions and Roles for Lambda@Edge.
+
+The following Lambda code provides an B- scan evaluation from https://observatory.mozilla.org/. ~~The key issue blocking use of the Content-Security-Policy header is that the webpage uses scripts from stackpath.bootstrapcdn.com but that domain no longer has a valid cerificate. The website needs to be refactored/rewritten to not use that site.~~
+
+```javascript
+'use strict';
+exports.handler = (event, context, callback) => {
+
+    //Get contents of response
+    const response = event.Records[0].cf.response;
+    const headers = response.headers;
+
+    //Set new headers 
+    headers['strict-transport-security'] = [{key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubdomains; preload'}];
+    //headers['content-security-policy'] = [{key: 'Content-Security-Policy', value: "default-src 'self'; style-src 'self' 'unsafe-inline' adtran.css stackpath.bootstrapcdn.com; img-src 'self'; script-src 'self' use.fontawesome.com code.jquery.com cdnjs.cloudflare.com https://cognito-idp.us-east-2.amazonaws.com/'; frame-ancestors 'self'"}];
+    headers['x-frame-options'] = [{key: 'X-Frame-Options', value: 'SAMEORIGIN'}];
+    headers['x-content-type-options'] = [{key: 'X-Content-Type-Options', value: 'nosniff'}]; 
+    headers['referrer-policy'] = [{key: 'Referrer-Policy', value: 'same-origin'}];
+
+    //Return modified response
+    callback(null, response);
+};
+```
 
 ## Testing and Troubleshooting
 

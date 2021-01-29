@@ -4,7 +4,7 @@ import EmbeddedDashboard from '../components/embedded-dashboard';
 
 const DegradedVectoringSystems = () => (
   <div>
-    <EmbeddedDashboard dashboardId={'919817ef-cba7-401a-ac51-6299aadd3d39'} title={'degraded vectoring systems'} cn={'App-degraded-vectoring-systems'} />
+    <EmbeddedDashboard dashboardId={'ebfa4039-f87d-41ec-8d39-075715ff650c'} title={'degraded vectoring systems'} cn={'App-degraded-vectoring-systems'} />
   </div>
 );
 
