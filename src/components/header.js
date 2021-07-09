@@ -48,49 +48,6 @@ class Header extends Component {
             { user && <SignOut theme={Bootstrap} /> }
           </div>
         </nav>
-        {/* <nav className="navbar navbar-expand-lg navbar-dark bg-secondary pt-0 pb-0 mt-1">
-          <div className="container">
-            <ul className="navbar-nav mr-auto">
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {I18n.get("Overview")}
-                </a>
-                <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <NavLink className="dropdown-item" to="/system-overview">{I18n.get("System Overview")}</NavLink>
-                  <NavLink className="dropdown-item" to="/pppoe-sessions-vs-ports-up">{I18n.get("PPPoE Session Abnormalities")}</NavLink>
-                  <NavLink className="dropdown-item" to="/system-outage-overview">{I18n.get("System Failure - Overview")}</NavLink>
-                  <NavLink className="dropdown-item" to="/recovery-repeater">{I18n.get("Vectoring Recovery Repeater")}</NavLink>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div className="container">
-            <ul className="navbar-nav mr-auto">
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {I18n.get("KPIs")}
-                </a>
-                <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <NavLink className="dropdown-item" to="/degraded-vectoring-systems">{I18n.get("Degraded Vectoring Systems - Overview")}</NavLink>
-                  <NavLink className="dropdown-item" to="/multi-retrains-and-togglers">{I18n.get("Systems with Multi-Retrains and Togglers")}</NavLink>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div className="container">
-            <ul className="navbar-nav mr-auto ">
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {I18n.get("Specific Fault Patterns - Intervention Required")}
-                </a>
-                <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <NavLink className="dropdown-item" to="/silent-ports-loopback-type">Silent Ports - Type Loopback Enabled</NavLink>
-                  <NavLink className="dropdown-item" to="/es-processing-stopped">{I18n.get("Stopped ES Processing")}</NavLink>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </nav> */}
       </div>
     );
   }

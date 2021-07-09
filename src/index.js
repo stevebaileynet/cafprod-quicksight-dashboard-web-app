@@ -2,41 +2,28 @@ import Bootstrap from './MyTheme';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import Amplify, { API, I18n } from 'aws-amplify';
+import Amplify, { I18n } from 'aws-amplify';
 import { Authenticator, Greetings, SignUp } from 'aws-amplify-react';
 import Footer from './components/footer';
 import SignInHeader from './components/signInHeader';
-// until AWS adds support for SameSite cookie storage, use a local one implemanted to add it
 
 Amplify.configure({
-  Auth: {
-      mandatorySignIn: true,
-      identityPoolId: 'us-east-2:911663b5-c59d-4a47-aeb3-367bfbfc93b2', //REQUIRED - Amazon Cognito Identity Pool ID
-      region: 'us-east-2', // REQUIRED - Amazon Cognito Region
-      userPoolId: 'us-east-2_ivDgwUc50', //OPTIONAL - Amazon Cognito User Pool ID
-      userPoolWebClientId: '6fp17oguimr6epghu3ekklqg04', //OPTIONAL - Amazon Cognito Web Client ID
-  },
-  API: {
-    endpoints: [
-      {
-        name: "analytics",
-        endpoint: "https://0t0amzagza.execute-api.us-east-2.amazonaws.com/dev",
-      }
-    ]
-  }
+    Auth: {
+        mandatorySignIn: true,
+        identityPoolId: 'us-east-2:911663b5-c59d-4a47-aeb3-367bfbfc93b2', //REQUIRED - Amazon Cognito Identity Pool ID
+        region: 'eu-east-2', // REQUIRED - Amazon Cognito Region
+        userPoolId: 'us-east-2_ivDgwUc50', //OPTIONAL - Amazon Cognito User Pool ID
+        userPoolWebClientId: '6fp17oguimr6epghu3ekklqg04', //OPTIONAL - Amazon Cognito Web Client ID
+    },
+    API: {
+      endpoints: [
+        {
+          name: "cafdev-dashboards",
+          endpoint: "https://0t0amzagza.execute-api.us-east-2.amazonaws.com/dev"
+        }
+      ]
+    }
 });
-
-// not needed?
-// API.configure({
-//   API: {
-//     endpoints: [
-//       {
-//         name: "analytics",
-//         endpoint: "https://0t0amzagza.execute-api.us-east-2.amazonaws.com/dev"
-//       }
-//     ]
-//   }
-// });
 
 const dict={
   'de': {
