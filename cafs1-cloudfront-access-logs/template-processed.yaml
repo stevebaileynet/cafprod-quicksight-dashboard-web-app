@@ -1,0 +1,1109 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "TransformPartFnHourlyEvt": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "cron(1 * * * ? *)",
+        "Targets": [
+          {
+            "Id": "TransformPartFnHourlyEvtLambdaTarget",
+            "Arn": {
+              "Fn::GetAtt": [
+                "TransformPartFn",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "MoveNewAccessLogsFn": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "proservicesaws-logs-us-east-2",
+          "S3Key": "cafprod-cf-sam/4ef5ccfe457cba290d514f1447214fb0"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "TARGET_KEY_PREFIX": {
+              "Ref": "GzKeyPrefix"
+            }
+          }
+        },
+        "Handler": "moveAccessLogs.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MoveNewAccessLogsFnRole",
+            "Arn"
+          ]
+        },
+        "Timeout": 30,
+        "Runtime": "nodejs12.x"
+      }
+    },
+    "TransformPartFnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "TransformPartFnRolePolicy0",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "athena:StartQueryExecution",
+                    "athena:GetQueryExecution"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ResourcePrefix}-${AWS::AccountId}-cf-access-logs"
+                  },
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetObject"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/*"
+                  },
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "glue:CreatePartition",
+                    "glue:GetDatabase",
+                    "glue:GetTable",
+                    "glue:BatchCreatePartition",
+                    "glue:GetPartition",
+                    "glue:GetPartitions",
+                    "glue:CreateTable",
+                    "glue:DeleteTable",
+                    "glue:DeletePartition"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "CreatePartFn": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "proservicesaws-logs-us-east-2",
+          "S3Key": "cafprod-cf-sam/4ef5ccfe457cba290d514f1447214fb0"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "TABLE": {
+              "Ref": "PartitionedGzTable"
+            },
+            "ATHENA_QUERY_RESULTS_LOCATION": {
+              "Fn::Sub": "s3://${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/athena-query-results"
+            },
+            "DATABASE": {
+              "Ref": "CfLogsDatabase"
+            }
+          }
+        },
+        "Handler": "createPartitions.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "CreatePartFnRole",
+            "Arn"
+          ]
+        },
+        "Timeout": 5,
+        "Runtime": "nodejs12.x"
+      }
+    },
+    "MoveNewAccessLogsFnAccessLogsUploadedEventPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        },
+        "FunctionName": {
+          "Ref": "MoveNewAccessLogsFn"
+        },
+        "Principal": "s3.amazonaws.com"
+      }
+    },
+    "PartitionedParquetTable": {
+      "Type": "AWS::Glue::Table",
+      "Properties": {
+        "TableInput": {
+          "PartitionKeys": [
+            {
+              "Type": "string",
+              "Name": "year"
+            },
+            {
+              "Type": "string",
+              "Name": "month"
+            },
+            {
+              "Type": "string",
+              "Name": "day"
+            },
+            {
+              "Type": "string",
+              "Name": "hour"
+            }
+          ],
+          "StorageDescriptor": {
+            "SerdeInfo": {
+              "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+            },
+            "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+            "InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+            "Columns": [
+              {
+                "Type": "date",
+                "Name": "date"
+              },
+              {
+                "Type": "string",
+                "Name": "time"
+              },
+              {
+                "Type": "string",
+                "Name": "location"
+              },
+              {
+                "Type": "bigint",
+                "Name": "bytes"
+              },
+              {
+                "Type": "string",
+                "Name": "request_ip"
+              },
+              {
+                "Type": "string",
+                "Name": "method"
+              },
+              {
+                "Type": "string",
+                "Name": "host"
+              },
+              {
+                "Type": "string",
+                "Name": "uri"
+              },
+              {
+                "Type": "int",
+                "Name": "status"
+              },
+              {
+                "Type": "string",
+                "Name": "referrer"
+              },
+              {
+                "Type": "string",
+                "Name": "user_agent"
+              },
+              {
+                "Type": "string",
+                "Name": "query_string"
+              },
+              {
+                "Type": "string",
+                "Name": "cookie"
+              },
+              {
+                "Type": "string",
+                "Name": "result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "request_id"
+              },
+              {
+                "Type": "string",
+                "Name": "host_header"
+              },
+              {
+                "Type": "string",
+                "Name": "request_protocol"
+              },
+              {
+                "Type": "bigint",
+                "Name": "request_bytes"
+              },
+              {
+                "Type": "float",
+                "Name": "time_taken"
+              },
+              {
+                "Type": "string",
+                "Name": "xforwarded_for"
+              },
+              {
+                "Type": "string",
+                "Name": "ssl_protocol"
+              },
+              {
+                "Type": "string",
+                "Name": "ssl_cipher"
+              },
+              {
+                "Type": "string",
+                "Name": "response_result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "http_version"
+              },
+              {
+                "Type": "string",
+                "Name": "fle_status"
+              },
+              {
+                "Type": "int",
+                "Name": "fle_encrypted_fields"
+              },
+              {
+                "Type": "int",
+                "Name": "c_port"
+              },
+              {
+                "Type": "float",
+                "Name": "time_to_first_byte"
+              },
+              {
+                "Type": "string",
+                "Name": "x_edge_detailed_result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "sc_content_type"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_content_len"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_range_start"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_range_end"
+              }
+            ],
+            "Location": {
+              "Fn::Sub": "s3://${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/${ParquetKeyPrefix}"
+            }
+          },
+          "Parameters": {
+            "has_encrypted_data": "false",
+            "parquet.compression": "SNAPPY"
+          },
+          "Description": "Parquet format access logs as transformed from gzip version",
+          "TableType": "EXTERNAL_TABLE",
+          "Name": "partitioned_parquet"
+        },
+        "DatabaseName": {
+          "Ref": "CfLogsDatabase"
+        },
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "CloudFrontAccessLogsBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Resource": [
+                {
+                  "Fn::Sub": "${CloudFrontAccessLogsBucket.Arn}"
+                },
+                {
+                  "Fn::Sub": "${CloudFrontAccessLogsBucket.Arn}/*"
+                }
+              ],
+              "Effect": "Deny",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              },
+              "Principal": "*"
+            }
+          ]
+        },
+        "Bucket": {
+          "Ref": "CloudFrontAccessLogsBucket"
+        }
+      }
+    },
+    "CreatePartFnHourlyEvt": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "cron(55 * * * ? *)",
+        "Targets": [
+          {
+            "Id": "CreatePartFnHourlyEvtLambdaTarget",
+            "Arn": {
+              "Fn::GetAtt": [
+                "CreatePartFn",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CloudFrontAccessLogsBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "PublicAccessBlockConfiguration": {
+          "IgnorePublicAcls": true,
+          "BlockPublicPolicy": true,
+          "BlockPublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Function": {
+                "Fn::GetAtt": [
+                  "MoveNewAccessLogsFn",
+                  "Arn"
+                ]
+              },
+              "Filter": {
+                "S3Key": {
+                  "Rules": [
+                    {
+                      "Name": "prefix",
+                      "Value": {
+                        "Ref": "NewKeyPrefix"
+                      }
+                    }
+                  ]
+                }
+              },
+              "Event": "s3:ObjectCreated:*"
+            }
+          ]
+        },
+        "BucketName": {
+          "Fn::Sub": "${ResourcePrefix}-${AWS::AccountId}-cf-access-logs"
+        }
+      },
+      "DependsOn": [
+        "MoveNewAccessLogsFnAccessLogsUploadedEventPermission"
+      ]
+    },
+    "TransformPartFnHourlyEvtPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "FunctionName": {
+          "Ref": "TransformPartFn"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "TransformPartFnHourlyEvt",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "PartitionedGzTable": {
+      "Type": "AWS::Glue::Table",
+      "Properties": {
+        "TableInput": {
+          "PartitionKeys": [
+            {
+              "Type": "string",
+              "Name": "year"
+            },
+            {
+              "Type": "string",
+              "Name": "month"
+            },
+            {
+              "Type": "string",
+              "Name": "day"
+            },
+            {
+              "Type": "string",
+              "Name": "hour"
+            }
+          ],
+          "StorageDescriptor": {
+            "SerdeInfo": {
+              "SerializationLibrary": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+              "Parameters": {
+                "field.delim\"": "\t",
+                "serialization.format": "\t"
+              }
+            },
+            "OutputFormat": "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
+            "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+            "Columns": [
+              {
+                "Type": "date",
+                "Name": "date"
+              },
+              {
+                "Type": "string",
+                "Name": "time"
+              },
+              {
+                "Type": "string",
+                "Name": "location"
+              },
+              {
+                "Type": "bigint",
+                "Name": "bytes"
+              },
+              {
+                "Type": "string",
+                "Name": "request_ip"
+              },
+              {
+                "Type": "string",
+                "Name": "method"
+              },
+              {
+                "Type": "string",
+                "Name": "host"
+              },
+              {
+                "Type": "string",
+                "Name": "uri"
+              },
+              {
+                "Type": "int",
+                "Name": "status"
+              },
+              {
+                "Type": "string",
+                "Name": "referrer"
+              },
+              {
+                "Type": "string",
+                "Name": "user_agent"
+              },
+              {
+                "Type": "string",
+                "Name": "query_string"
+              },
+              {
+                "Type": "string",
+                "Name": "cookie"
+              },
+              {
+                "Type": "string",
+                "Name": "result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "request_id"
+              },
+              {
+                "Type": "string",
+                "Name": "host_header"
+              },
+              {
+                "Type": "string",
+                "Name": "request_protocol"
+              },
+              {
+                "Type": "bigint",
+                "Name": "request_bytes"
+              },
+              {
+                "Type": "float",
+                "Name": "time_taken"
+              },
+              {
+                "Type": "string",
+                "Name": "xforwarded_for"
+              },
+              {
+                "Type": "string",
+                "Name": "ssl_protocol"
+              },
+              {
+                "Type": "string",
+                "Name": "ssl_cipher"
+              },
+              {
+                "Type": "string",
+                "Name": "response_result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "http_version"
+              },
+              {
+                "Type": "string",
+                "Name": "fle_status"
+              },
+              {
+                "Type": "int",
+                "Name": "fle_encrypted_fields"
+              },
+              {
+                "Type": "int",
+                "Name": "c_port"
+              },
+              {
+                "Type": "float",
+                "Name": "time_to_first_byte"
+              },
+              {
+                "Type": "string",
+                "Name": "x_edge_detailed_result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "sc_content_type"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_content_len"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_range_start"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_range_end"
+              }
+            ],
+            "Location": {
+              "Fn::Sub": "s3://${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/${GzKeyPrefix}"
+            }
+          },
+          "Parameters": {
+            "skip.header.line.count": "2"
+          },
+          "Description": "Gzip logs delivered by Amazon CloudFront partitioned",
+          "TableType": "EXTERNAL_TABLE",
+          "Name": "partitioned_gz"
+        },
+        "DatabaseName": {
+          "Ref": "CfLogsDatabase"
+        },
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "CreatePartFnHourlyEvtPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "FunctionName": {
+          "Ref": "CreatePartFn"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "CreatePartFnHourlyEvt",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "MoveNewAccessLogsFnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "MoveNewAccessLogsFnRolePolicy0",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:DeleteObject"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/${NewKeyPrefix}*"
+                  },
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/${GzKeyPrefix}*"
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "CreatePartFnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "CreatePartFnRolePolicy0",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "athena:StartQueryExecution",
+                    "athena:GetQueryExecution"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ResourcePrefix}-${AWS::AccountId}-cf-access-logs"
+                  },
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/*"
+                  },
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "glue:CreatePartition",
+                    "glue:GetDatabase",
+                    "glue:GetTable",
+                    "glue:BatchCreatePartition"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "TransformPartFn": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "proservicesaws-logs-us-east-2",
+          "S3Key": "cafprod-cf-sam/4ef5ccfe457cba290d514f1447214fb0"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "SOURCE_TABLE": {
+              "Ref": "PartitionedGzTable"
+            },
+            "ATHENA_QUERY_RESULTS_LOCATION": {
+              "Fn::Sub": "s3://${ResourcePrefix}-${AWS::AccountId}-cf-access-logs/athena-query-results"
+            },
+            "TARGET_TABLE": {
+              "Ref": "PartitionedParquetTable"
+            },
+            "DATABASE": {
+              "Ref": "CfLogsDatabase"
+            }
+          }
+        },
+        "Handler": "transformPartition.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "TransformPartFnRole",
+            "Arn"
+          ]
+        },
+        "Timeout": 900,
+        "Runtime": "nodejs12.x"
+      }
+    },
+    "CombinedView": {
+      "Type": "AWS::Glue::Table",
+      "Properties": {
+        "TableInput": {
+          "StorageDescriptor": {
+            "SerdeInfo": {},
+            "Columns": [
+              {
+                "Type": "date",
+                "Name": "date"
+              },
+              {
+                "Type": "string",
+                "Name": "time"
+              },
+              {
+                "Type": "string",
+                "Name": "location"
+              },
+              {
+                "Type": "bigint",
+                "Name": "bytes"
+              },
+              {
+                "Type": "string",
+                "Name": "request_ip"
+              },
+              {
+                "Type": "string",
+                "Name": "method"
+              },
+              {
+                "Type": "string",
+                "Name": "host"
+              },
+              {
+                "Type": "string",
+                "Name": "uri"
+              },
+              {
+                "Type": "int",
+                "Name": "status"
+              },
+              {
+                "Type": "string",
+                "Name": "referrer"
+              },
+              {
+                "Type": "string",
+                "Name": "user_agent"
+              },
+              {
+                "Type": "string",
+                "Name": "query_string"
+              },
+              {
+                "Type": "string",
+                "Name": "cookie"
+              },
+              {
+                "Type": "string",
+                "Name": "result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "request_id"
+              },
+              {
+                "Type": "string",
+                "Name": "host_header"
+              },
+              {
+                "Type": "string",
+                "Name": "request_protocol"
+              },
+              {
+                "Type": "bigint",
+                "Name": "request_bytes"
+              },
+              {
+                "Type": "float",
+                "Name": "time_taken"
+              },
+              {
+                "Type": "string",
+                "Name": "xforwarded_for"
+              },
+              {
+                "Type": "string",
+                "Name": "ssl_protocol"
+              },
+              {
+                "Type": "string",
+                "Name": "ssl_cipher"
+              },
+              {
+                "Type": "string",
+                "Name": "response_result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "http_version"
+              },
+              {
+                "Type": "string",
+                "Name": "fle_status"
+              },
+              {
+                "Type": "int",
+                "Name": "fle_encrypted_fields"
+              },
+              {
+                "Type": "int",
+                "Name": "c_port"
+              },
+              {
+                "Type": "float",
+                "Name": "time_to_first_byte"
+              },
+              {
+                "Type": "string",
+                "Name": "x_edge_detailed_result_type"
+              },
+              {
+                "Type": "string",
+                "Name": "sc_content_type"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_content_len"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_range_start"
+              },
+              {
+                "Type": "bigint",
+                "Name": "sc_range_end"
+              },
+              {
+                "Type": "string",
+                "Name": "year"
+              },
+              {
+                "Type": "string",
+                "Name": "month"
+              },
+              {
+                "Type": "string",
+                "Name": "day"
+              },
+              {
+                "Type": "string",
+                "Name": "hour"
+              },
+              {
+                "Type": "string",
+                "Name": "file"
+              }
+            ]
+          },
+          "PartitionKeys": [],
+          "Name": "combined",
+          "Parameters": {
+            "presto_view": "true"
+          },
+          "ViewOriginalText": {
+            "Fn::Join": [
+              "",
+              [
+                "/* Presto View: ",
+                {
+                  "Fn::Base64": {
+                    "Fn::Sub": [
+                      "{\n  \"originalSql\": \"SELECT *, \\\"$path\\\" as file FROM ${database}.${partitioned_gz_table} WHERE (concat(year, month, day, hour) >= date_format(date_trunc('hour', ((current_timestamp - INTERVAL  '15' MINUTE) - INTERVAL  '1' HOUR)), '%Y%m%d%H')) UNION ALL SELECT *, \\\"$path\\\" as file FROM ${database}.${partitioned_parquet_table} WHERE (concat(year, month, day, hour) < date_format(date_trunc('hour', ((current_timestamp - INTERVAL  '15' MINUTE) - INTERVAL  '1' HOUR)), '%Y%m%d%H'))\",\n  \"catalog\": \"awsdatacatalog\",\n  \"schema\": \"${database}\",\n  \"columns\": [\n    {\"name\": \"date\", \"type\": \"date\"},\n    {\"name\": \"time\", \"type\": \"varchar\"},\n    {\"name\": \"location\", \"type\": \"varchar\"},\n    {\"name\": \"bytes\", \"type\": \"bigint\"},\n    {\"name\": \"request_ip\", \"type\": \"varchar\"},\n    {\"name\": \"method\", \"type\": \"varchar\"},\n    {\"name\": \"host\", \"type\": \"varchar\"},\n    {\"name\": \"uri\", \"type\": \"varchar\"},\n    {\"name\": \"status\", \"type\": \"integer\"},\n    {\"name\": \"referrer\", \"type\": \"varchar\"},\n    {\"name\": \"user_agent\", \"type\": \"varchar\"},\n    {\"name\": \"query_string\", \"type\": \"varchar\"},\n    {\"name\": \"cookie\", \"type\": \"varchar\"},\n    {\"name\": \"result_type\", \"type\": \"varchar\"},\n    {\"name\": \"request_id\", \"type\": \"varchar\"},\n    {\"name\": \"host_header\", \"type\": \"varchar\"},\n    {\"name\": \"request_protocol\", \"type\": \"varchar\"},\n    {\"name\": \"request_bytes\", \"type\": \"bigint\"},\n    {\"name\": \"time_taken\", \"type\": \"real\"},\n    {\"name\": \"xforwarded_for\", \"type\": \"varchar\"},\n    {\"name\": \"ssl_protocol\", \"type\": \"varchar\"},\n    {\"name\": \"ssl_cipher\", \"type\": \"varchar\"},\n    {\"name\": \"response_result_type\", \"type\": \"varchar\"},\n    {\"name\": \"http_version\", \"type\": \"varchar\"},\n    {\"name\": \"fle_status\", \"type\": \"varchar\"},\n    {\"name\": \"fle_encrypted_fields\", \"type\": \"integer\"},\n    {\"name\": \"c_port\", \"type\": \"integer\"},\n    {\"name\": \"time_to_first_byte\", \"type\": \"real\"},\n    {\"name\": \"x_edge_detailed_result_type\", \"type\": \"varchar\"},\n    {\"name\": \"sc_content_type\", \"type\": \"varchar\"},\n    {\"name\": \"sc_content_len\", \"type\": \"bigint\"},\n    {\"name\": \"sc_range_start\", \"type\": \"bigint\"},\n    {\"name\": \"sc_range_end\", \"type\": \"bigint\"},\n    {\"name\": \"year\", \"type\": \"varchar\"},\n    {\"name\": \"month\", \"type\": \"varchar\"},\n    {\"name\": \"day\", \"type\": \"varchar\"},\n    {\"name\": \"hour\", \"type\": \"varchar\"},\n    {\"name\": \"file\", \"type\": \"varchar\"}\n  ]\n}",
+                      {
+                        "partitioned_gz_table": {
+                          "Ref": "PartitionedGzTable"
+                        },
+                        "partitioned_parquet_table": {
+                          "Ref": "PartitionedParquetTable"
+                        },
+                        "database": {
+                          "Ref": "CfLogsDatabase"
+                        }
+                      }
+                    ]
+                  }
+                },
+                " */"
+              ]
+            ]
+          },
+          "TableType": "VIRTUAL_VIEW",
+          "Description": "combined view over gzip and parquet tables"
+        },
+        "DatabaseName": {
+          "Ref": "CfLogsDatabase"
+        },
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "CfLogsDatabase": {
+      "Type": "AWS::Glue::Database",
+      "Properties": {
+        "DatabaseInput": {
+          "Name": {
+            "Fn::Sub": "${ResourcePrefix}_cf_access_logs_db"
+          }
+        },
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    }
+  },
+  "Description": "Stack that deploys a bucket which you can use as a target for your Amazon CloudFront access logs (use the prefix 'new/'). An event notification is configured so that new objects created will fire an AWS Lambda function that moves the objects to prefixes (under 'partitioned-gz/') that adhere to the Apache Hive partitioning format. This way the data is easier to consume for big data tools (as Amazon Athena and AWS Glue).\n",
+  "Parameters": {
+    "ParquetKeyPrefix": {
+      "Default": "partitioned-parquet/",
+      "AllowedPattern": "[A-Za-z0-9\\-]+/",
+      "Type": "String",
+      "Description": "Prefix of parquet files that are created in Apache Hive like style by the CTAS query. Including the trailing slash.\n"
+    },
+    "GzKeyPrefix": {
+      "Default": "partitioned-gz/",
+      "AllowedPattern": "[A-Za-z0-9\\-]+/",
+      "Type": "String",
+      "Description": "Prefix of gzip'ed access log files that are moved to the Apache Hive like style. Including the trailing slash.\n"
+    },
+    "ResourcePrefix": {
+      "Description": "Prefix that is used for the created resources (20 chars, a-z and 0-9 only)\n",
+      "Default": "cafprod",
+      "MinLength": 1,
+      "AllowedPattern": "[a-z0-9]+",
+      "MaxLength": 20,
+      "Type": "String"
+    },
+    "NewKeyPrefix": {
+      "Default": "new/",
+      "AllowedPattern": "[A-Za-z0-9\\-]+/",
+      "Type": "String",
+      "Description": "Prefix of new access log files that are written by Amazon CloudFront. Including the trailing slash.\n"
+    }
+  }
+}
+
+
+

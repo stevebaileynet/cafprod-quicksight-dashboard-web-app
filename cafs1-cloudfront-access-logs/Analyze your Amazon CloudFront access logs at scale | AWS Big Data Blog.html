@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en-US" class="no-js aws-lng-en_US" xmlns="http://www.w3.org/1999/xhtml" data-aws-assets="//a0.awsstatic.com" data-js-version="1.0.606" data-css-version="1.0.524" data-static-assets="//a0.awsstatic.com" prefix="og: http://ogp.me/ns#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <title>Analyze your Amazon CloudFront access logs at scale | AWS Big Data Blog</title> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://a0.awsstatic.com; connect-src 'self' *.akamaized.net *.googlevideo.com/videoplayback https://112-tzm-766.mktoresp.com https://112-tzm-766.mktoutil.com https://a0.awsstatic.com https://a0.p.awsstatic.com https://a1.awsstatic.com https://amazonwebservices.d2.sc.omtrdc.net https://amazonwebservicesinc.tt.omtrdc.net https://api.regional-table.region-services.aws.a2z.com https://api.us-west-2.prod.pricing.aws.a2z.com https://aws.demdex.net https://b0.p.awsstatic.com https://c0.b0.p.awsstatic.com https://calculator.aws https://cm.everesttech.net https://d0.awsstatic.com https://d1.awsstatic.com https://d1fgizr415o1r6.cloudfront.net https://d3borx6sfvnesb.cloudfront.net https://dc.ads.linkedin.com https://dftu77xade0tc.cloudfront.net https://dpm.demdex.net https://fls-na.amazon.com https://googleads.g.doubleclick.net https://i18n-string.us-west-2.prod.pricing.aws.a2z.com https://prod-us-west-2.csp-report.marketing.aws.dev https://prod-us-west-2.csp-report.marketing.aws.dev/submit https://prod.log.shortbread.aws.dev https://prod.tools.shortbread.aws.dev https://s0.awsstatic.com https://s3.amazonaws.com/aws-messaging-pricing-information/ https://s3.amazonaws.com/public-pricing-agc/ https://spot-bid-advisor.s3.amazonaws.com https://view-stage.us-west-2.prod.pricing.aws.a2z.com https://view-staging.us-east-1.prod.plc1-prod.pricing.aws.a2z.com https://www.youtube-nocookie.com https://www.youtube.com; font-src 'self' data: https://a0.awsstatic.com https://c.disquscdn.com https://f0.awsstatic.com https://fonts.gstatic.com; frame-src 'self' https://aws.demdex.net https://c0.b0.p.awsstatic.com https://calculator.aws https://commenting.awsblogs.com https://disqus.com https://dpm.demdex.net https://player.vimeo.com https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: https://*.ads.linkedin.com https://*.githubusercontent.com https://*.gravatar.com https://*.vidyard.com https://*.ytimg.com https://a0.awsstatic.com https://amazonwebservices.d2.sc.omtrdc.net https://aws-blogs-media-prod.s3.amazonaws.com https://aws-database-blog.s3.amazonaws.com https://aws-ml-blog.s3.amazonaws.com https://aws-quickstart.s3.amazonaws.com https://aws.amazon.com https://aws.demdex.net https://awscomputeblogimages.s3-us-west-2.amazonaws.com/ https://awscomputeblogmedia.s3.amazonaws.com/ https://awsmedia.s3.amazonaws.com https://awsopensourceblog.s3.us-east-2.amazonaws.com/ https://bank-test2.s3.amazonaws.com https://cdn.amazonblogs.com https://cm.everesttech.net https://d1.awsstatic.com https://d1nqddva888cns.cloudfront.net https://d2908q01vomqb2.cloudfront.net https://d2mee59kmfnfxw.cloudfront.net https://d2tinsms4add52.cloudfront.net https://d36cz9buwru1tt.cloudfront.net https://denisb-public.s3.amazonaws.com https://dmhnzl5mp9mj6.cloudfront.net https://docs.aws.amazon.com https://dpm.demdex.net https://fls-na.amazon.com https://g.cn https://github.com https://google.ac https://google.ad https://google.ae https://google.al https://google.am https://google.as https://google.at https://google.az https://google.ba https://google.be https://google.bf https://google.bg https://google.bi https://google.bj https://google.bs https://google.bt https://google.by https://google.ca https://google.cat https://google.cc https://google.cd https://google.cf https://google.cg https://google.ch https://google.ci https://google.cl https://google.cm https://google.cn https://google.co.ao https://google.co.bw https://google.co.ck https://google.co.cr https://google.co.id https://google.co.il https://google.co.in https://google.co.jp https://google.co.ke https://google.co.kr https://google.co.ls https://google.co.ma https://google.co.mz https://google.co.nz https://google.co.pn https://google.co.th https://google.co.tz https://google.co.ug https://google.co.uk https://google.co.uz https://google.co.ve https://google.co.vi https://google.co.za https://google.co.zm https://google.co.zw https://google.com https://google.com.af https://google.com.ag https://google.com.ai https://google.com.ar https://google.com.au https://google.com.bd https://google.com.bh https://google.com.bn https://google.com.bo https://google.com.br https://google.com.bz https://google.com.co https://google.com.cu https://google.com.cy https://google.com.do https://google.com.ec https://google.com.eg https://google.com.et https://google.com.fj https://google.com.gh https://google.com.gi https://google.com.gt https://google.com.hk https://google.com.jm https://google.com.kh https://google.com.kw https://google.com.lb https://google.com.lc https://google.com.ly https://google.com.mm https://google.com.mt https://google.com.mx https://google.com.my https://google.com.na https://google.com.nf https://google.com.ng https://google.com.ni https://google.com.np https://google.com.om https://google.com.pa https://google.com.pe https://google.com.pg https://google.com.ph https://google.com.pk https://google.com.pr https://google.com.py https://google.com.qa https://google.com.sa https://google.com.sb https://google.com.sg https://google.com.sl https://google.com.sv https://google.com.tj https://google.com.tr https://google.com.tw https://google.com.ua https://google.com.uy https://google.com.vc https://google.com.vn https://google.cv https://google.cz https://google.de https://google.dj https://google.dk https://google.dm https://google.dz https://google.ee https://google.es https://google.fi https://google.fm https://google.fr https://google.ga https://google.ge https://google.gf https://google.gg https://google.gl https://google.gm https://google.gp https://google.gr https://google.gy https://google.hn https://google.hr https://google.ht https://google.hu https://google.ie https://google.im https://google.io https://google.iq https://google.is https://google.it https://google.je https://google.jo https://google.kg https://google.ki https://google.kz https://google.la https://google.li https://google.lk https://google.lt https://google.lu https://google.lv https://google.md https://google.me https://google.mg https://google.mk https://google.ml https://google.mn https://google.ms https://google.mu https://google.mv https://google.mw https://google.ne https://google.nl https://google.no https://google.nr https://google.nu https://google.pl https://google.pn https://google.ps https://google.pt https://google.ro https://google.rs https://google.ru https://google.rw https://google.sc https://google.se https://google.sh https://google.si https://google.sk https://google.sm https://google.sn https://google.so https://google.sr https://google.st https://google.td https://google.tg https://google.tk https://google.tl https://google.tm https://google.tn https://google.to https://google.tt https://google.vg https://google.vu https://google.ws https://googleads.g.doubleclick.net https://img.youtube.com https://marcia.dev https://marketingplatform.google.com https://media.amazonwebservices.com https://p.adsymptotic.com https://pages.awscloud.com https://pbs.twimg.com https://s3-us-west-2.amazonaws.com/aws-developer-blog-media/ https://s3.amazonaws.com/apnblog/ https://s3.amazonaws.com/aws-bigdata-blog/ https://s3.amazonaws.com/aws-iot-blog-assets/ https://s3.amazonaws.com/aws-machine-learning-blog/ https://s3.amazonaws.com/aws-quickstart/ https://s3.amazonaws.com/awsemailuploads/ https://s3.amazonaws.com/chrisb/ https://s3.amazonaws.com/cloudformation-examples/ https://s3.cn-north-1.amazonaws.com.cn/awschinablog/ https://s3.cn-north-1.amazonaws.com.cn/images-bjs/ https://ssl-static.libsyn.com https://static-cdn.jtvnw.net https://www.google.com https://www.linkedin.com https://yt3.ggpht.com; media-src 'self' https://*.libsyn.com https://a0.awsstatic.com https://anchor.fm https://aws-automotive-blogs.s3.amazonaws.com https://aws-big-data-blog.s3.amazonaws.com https://aws-bigdata-blog.s3.amazonaws.com https://aws-database-blog.s3.amazonaws.com https://aws-ml-blog.s3.amazonaws.com https://awschinablog.s3.cn-north-1.amazonaws.com.cn https://awsmedia.s3.amazonaws.com https://awsopensourceblog.s3.us-east-2.amazonaws.com/ https://awspodcastsiberiaent.s3.eu-west-3.amazonaws.com https://awssecurityroadshow2020.s3-ap-northeast-1.amazonaws.com https://chtbl.com https://computeblog-us-east-1.s3.amazonaws.com https://d1.awsstatic.com https://d1hemuljm71t2j.cloudfront.net https://d1le29qyzha1u4.cloudfront.net https://d1oqpvwii7b6rh.cloudfront.net https://d1vo51ubqkiilx.cloudfront.net https://d1yyh5dhdgifnx.cloudfront.net https://d2908q01vomqb2.cloudfront.net https://d2a6igt6jhaluh.cloudfront.net https://d2mee59kmfnfxw.cloudfront.net https://d3ctxlq1ktw2nl.cloudfront.net https://d3h2ozso0dirfl.cloudfront.net https://dgen8gghn3u86.cloudfront.net https://dk261l6wntthl.cloudfront.net https://download.stormacq.com/aws/podcast/ https://dts.podtrac.com https://jsimon-polly.s3.amazonaws.com https://jsimon-transcribe-demo.s3-us-west-2.amazonaws.com https://media.amazonwebservices.com https://mktg-apac.s3-ap-southeast-1.amazonaws.com https://s3-ap-northeast-1.amazonaws.com/aws-china-media/ https://s3-us-west-2.amazonaws.com/aws-developer-blog-media/ https://s3.amazonaws.com/aws-bigdata-blog/ https://s3.amazonaws.com/aws-machine-learning-blog/ https://www.buzzsprout.com; object-src 'none'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://a0.awsstatic.com https://amazonwebservicesinc.tt.omtrdc.net https://aws-official-blog.disqus.com https://aws-publicsector-blog.disqus.com https://c.disquscdn.com https://f.vimeocdn.com https://googleads.g.doubleclick.net https://referrer.disqus.com https://spot-price.s3.amazonaws.com https://static.doubleclick.net https://website.spot.ec2.aws.a2z.com https://www.google.com https://www.gstatic.com https://www.youtube.com/iframe_api https://www.youtube.com/s/player/; style-src 'self' 'unsafe-inline' https://a0.awsstatic.com https://c.disquscdn.com https://f.vimeocdn.com; report-uri https://prod-us-west-2.csp-report.marketing.aws.dev/submit" data-report-uri="https://prod-us-west-2.csp-report.marketing.aws.dev/submit"> 
+  <script src="//a0.awsstatic.com/libra/1.0.415/csp/csp-report.js"></script> 
+  <link rel="dns-prefetch" href="//a0.awsstatic.com"> 
+  <link rel="alternate" type="application/rss+xml" title="AWS Big Data Blog » Analyze your Amazon CloudFront access logs at scale Comments Feed" href="https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/feed/"> 
+  <link rel="canonical" href="https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:site_name" content="Amazon Web Services"> 
+  <meta property="og:title" content="Analyze your Amazon CloudFront access logs at scale | Amazon Web Services"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:url" content="https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/"> 
+  <meta property="og:description" content="This blog post focuses on two measures to restructure Amazon CloudFront access logs for optimization: partitioning and conversion to columnar formats. For more details on performance tuning read the blog post about the top 10 performance tuning tips for Amazon Athena."> 
+  <meta property="og:image" content="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront3.jpg"> 
+  <meta property="og:image:width" content="800"> 
+  <meta property="og:image:height" content="446"> 
+  <meta property="og:updated_time" content="2019-03-05T09:31:10-07:00"> 
+  <meta property="article:publisher" content="https://www.facebook.com/amazonwebservices"> 
+  <meta property="article:section" content="Amazon CloudFront"> 
+  <meta property="article:tag" content="Amazon CloudFront"> 
+  <meta property="article:tag" content="AWS Big Data"> 
+  <meta property="article:tag" content="Amazon Cloudfront"> 
+  <meta property="article:published_time" content="2018-12-21T11:01:36-07:00"> 
+  <meta property="article:modified_time" content="2019-03-05T09:31:10-07:00"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:site" content="@awscloud"> 
+  <meta name="twitter:domain" content="https://aws.amazon.com/blogs/"> 
+  <meta name="twitter:title" content="Analyze your Amazon CloudFront access logs at scale | Amazon Web Services"> 
+  <meta name="twitter:description" content="This blog post focuses on two measures to restructure Amazon CloudFront access logs for optimization: partitioning and conversion to columnar formats. For more details on performance tuning read the blog post about the top 10 performance tuning tips for Amazon Athena."> 
+  <meta name="twitter:image" content="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront3.jpg"> 
+  <link rel="icon" type="image/ico" href="//a0.awsstatic.com/main/images/site/fav/favicon.ico"> 
+  <link rel="shortcut icon" type="image/ico" href="//a0.awsstatic.com/main/images/site/fav/favicon.ico"> 
+  <link rel="apple-touch-icon" sizes="57x57" href="//a0.awsstatic.com/main/images/site/touch-icon-iphone-114-smile.png"> 
+  <link rel="apple-touch-icon" sizes="72x72" href="//a0.awsstatic.com/main/images/site/touch-icon-ipad-144-smile.png"> 
+  <link rel="apple-touch-icon" sizes="114x114" href="//a0.awsstatic.com/main/images/site/touch-icon-iphone-114-smile.png"> 
+  <link rel="apple-touch-icon" sizes="144x144" href="//a0.awsstatic.com/main/images/site/touch-icon-ipad-144-smile.png"> 
+  <link rel="home" type="application/rss+xml" title="RSS 2.0 Feed" href="https://aws.amazon.com/blogs/big-data/feed/"> 
+  <meta name="robots" content="index, follow"> 
+  <link rel="stylesheet" href="//a0.awsstatic.com/libra-css/css/1.0.400/style-awsm.css"> 
+  <link rel="stylesheet" href="//a0.awsstatic.com/aws-blog/1.0.49/css/blog.css"> 
+  <script>
+    var AWS = {
+      PageSettings: {
+        supportedLanguages: ["ar","de","en","es","fr","id","it","jp","ko","pt","ru","th","tr","vi","cn","tw"],
+        libraCSSPath: '//a0.awsstatic.com/libra-css/css/1.0.400',
+        currentLanguage: 'en-US',
+        blogPageTitle: "Analyze your Amazon CloudFront access logs at scale"      }
+    };
+    var require = {
+      baseUrl: '//a0.awsstatic.com',
+      packages: [
+        { name: 'libra', location: 'libra/1.0.415' }
+      ],
+      paths: {
+        'aws-blog': '//a0.awsstatic.com/aws-blog/1.0.49/js',
+        'blog': '//a0.awsstatic.com/chrome/js/1.0.606/blog',
+        'directories': '//a0.awsstatic.com/libra/1.0.415/directories',
+        'jquery': 'jquery-amd',
+        'librastandardlib': '//a0.awsstatic.com/libra/1.0.415/librastandardlib',
+        "plugins": '//a0.awsstatic.com/chrome/js/1.0.606/plugins',
+        "scripts": '//a0.awsstatic.com/libra/1.0.415/v1-polyfills/scripts'
+      },
+      deps: [ 'scripts' ],
+      waitSeconds: 15
+    };
+  </script> 
+  <script src="//a0.awsstatic.com/aws-blog/1.0.49/js/blog-head.js"></script> 
+  <script src="//a0.awsstatic.com/s_code/js/3.0/awshome_s_code.js"></script> 
+  <script>
+    AWS.TargetMediator = {
+      supportedLanguages: AWS.PageSettings.supportedLanguages,
+      pageLanguage: 'en',
+      customParams: {"category0":"Amazon CloudFront","category1":"AWS Big Data"}    };
+  </script> 
+  <script src="//a0.awsstatic.com/target/1.0.117/aws-target-mediator.js"></script> 
+  <noscript> 
+   <style>.js-mbox { visibility: visible; }</style> 
+  </noscript> 
+ </head> 
+ <body class="awsm aws-blogs-page aws-blogs-page-type-single"> 
+  <header id="aws-page-header" class="awsm m-page-header" role="banner"> 
+   <div id="m-nav" class="m-nav" role="navigation"> 
+    <div class="m-nav-header lb-clearfix" data-menu-url="https://s0.awsstatic.com/en_US/nav/v3/panel-content/desktop/index.html"> 
+     <div class="m-nav-logo"> 
+      <div class="lb-bg-logo aws-amazon_web_services_smile-header-desktop-en"> 
+       <a href="https://aws.amazon.com/?nc2=h_lg"><span>Click here to return to Amazon Web Services homepage</span></a> 
+      </div> 
+     </div> 
+     <div class="m-nav-secondary-links" style="min-width: 620px"> 
+      <a href="https://aws.amazon.com/contact-us/?nc2=h_header">Contact Us</a> 
+      <a class="lb-txt-none lb-tiny-iblock lb-txt-13 lb-txt lb-has-trigger-indicator" href="#" data-mbox-ignore="true" data-lb-popover-trigger="popover-support-selector"> Support&nbsp; <i class="icon-caret-down lb-trigger-mount"></i></a> 
+      <a id="m-nav-language-selector" class="lb-tiny-iblock lb-txt lb-has-trigger-indicator" href="#" data-lb-popover-trigger="popover-language-selector" data-language="en">English&nbsp;<i class="icon-caret-down lb-trigger-mount"></i></a> 
+      <a class="lb-tiny-iblock lb-txt lb-has-trigger-indicator" href="#" data-lb-popover-trigger="popover-my-account">My Account&nbsp;<i class="icon-caret-down lb-trigger-mount"></i></a> 
+      <div class="m-nav-cta-btn"> 
+       <div class="lb-mbox js-mbox" data-lb-comp="mbox" data-lb-comp-ignore="true" data-mbox="en_header_nav_cta"> 
+        <div class="lb-data-attr-wrapper data-attr-wrapper" data-da-type="so" data-da-so-type="viewport" data-da-so-language="en" data-da-so-category="monitoring" data-da-so-name="nav-buttons" data-da-so-version="sign-up-sign-in-all" data-da-so-url="nav"> 
+         <div class="data-attr-wrapper lb-tiny-iblock lb-none-pad lb-box" data-da-type="so" data-da-so-type="viewport" data-da-so-language="en" data-da-so-category="monitoring" data-da-so-name="nav-buttons" data-da-so-version="prospect-sign-in" data-da-so-url="all"> 
+          <a class="lb-txt-none lb-tiny-iblock lb-txt-13 lb-txt" style="padding-top:8px; padding-right:13px;" href="https://console.aws.amazon.com/console/home?nc2=h_ct&amp;src=header-signin"> Sign In</a> 
+         </div> 
+         <div class="data-attr-wrapper lb-tiny-iblock lb-none-v-margin lb-btn" data-da-type="so" data-da-so-type="viewport" data-da-so-language="en" data-da-so-category="monitoring" data-da-so-name="nav-buttons" data-da-so-version="prospect-signup" data-da-so-url="all"> 
+          <a class="lb-btn-p-primary" href="https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct&amp;src=header_signup" data-trk-params="{&quot;trkOverrideWithQs&quot;:true}" role="button"> <span> Create an AWS Account</span> </a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="m-nav-primary-group"> 
+      <div class="m-nav-primary-links"> 
+       <i class="m-nav-angle-left-icon" aria-hidden="true"></i> 
+       <ul> 
+        <li><a href="https://reinvent.awsevents.com/?nc2=h_rei" data-panel="m-nav-panel-reinvent21">re:Invent</a></li> 
+        <li><a href="https://aws.amazon.com/products/?nc2=h_ql_prod" data-panel="m-nav-panel-products">Products</a></li> 
+        <li><a href="https://aws.amazon.com/solutions/?nc2=h_ql_sol" data-panel="m-nav-panel-solutions">Solutions</a></li> 
+        <li><a href="https://aws.amazon.com/pricing/?nc2=h_ql_pr" data-panel="m-nav-panel-pricing">Pricing</a></li> 
+        <li><a href="https://docs.aws.amazon.com/index.html?nc2=h_ql_doc" data-panel="m-nav-panel-documentation">Documentation</a></li> 
+        <li><a href="https://aws.amazon.com/getting-started/?nc2=h_ql_le" data-panel="m-nav-panel-learn">Learn</a></li> 
+        <li><a href="https://aws.amazon.com/partners/?nc2=h_ql_pn" data-panel="m-nav-panel-partner">Partner Network</a></li> 
+        <li><a href="https://aws.amazon.com/marketplace/?nc2=h_ql_mp" data-panel="m-nav-panel-marketplace">AWS Marketplace</a></li> 
+        <li><a href="https://aws.amazon.com/customer-enablement/?nc2=h_ql_ce" data-panel="m-nav-panel-customer">Customer Enablement</a></li> 
+        <li><a href="https://aws.amazon.com/events/?nc2=h_ql_ev" data-panel="m-nav-panel-events">Events</a></li> 
+        <li><a href="https://aws.amazon.com/contact-us/?nc2=h_ql_exm" data-panel="m-nav-panel-more">Explore More </a></li> 
+       </ul> 
+       <div class="m-nav-icon-group"> 
+        <i class="m-nav-angle-right-icon" aria-hidden="true"></i> 
+        <i class="m-nav-search-icon"></i> 
+       </div> 
+      </div> 
+      <div class="m-nav-search"> 
+       <form action="https://aws.amazon.com/search/" role="search"> 
+        <div class="m-typeahead" data-directory-id="typeahead-suggestions" data-lb-comp="typeahead"> 
+         <input class="m-nav-search-field" placeholder="Search" autocomplete="off" spellcheck="false" dir="auto" type="text" name="searchQuery"> 
+        </div> 
+       </form> 
+       <i class="m-nav-close-icon"></i> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="lb-popover lb-popover-aui lb-popover-tiny" data-lb-comp="popover" data-id="popover-language-selector" data-action="hover" data-position="top"> 
+     <div class="lb-grid lb-row lb-row-max-large lb-snap"> 
+      <div class="lb-col lb-tiny-24 lb-mid-12"> 
+       <ul class="lb-txt-none lb-ul lb-list-style-none lb-tiny-ul-block"> 
+        <li data-language="ar"><a href="https://aws.amazon.com/ar/?nc1=h_ls">عربي</a></li> 
+        <li data-language="id"><a href="https://aws.amazon.com/id/?nc1=h_ls">Bahasa Indonesia</a></li> 
+        <li data-language="de"><a href="https://aws.amazon.com/de/?nc1=h_ls">Deutsch</a></li> 
+        <li data-language="en"><a href="https://aws.amazon.com/?nc1=h_ls">English</a></li> 
+        <li data-language="es"><a href="https://aws.amazon.com/es/?nc1=h_ls">Español</a></li> 
+        <li data-language="fr"><a href="https://aws.amazon.com/fr/?nc1=h_ls">Français</a></li> 
+        <li data-language="it"><a href="https://aws.amazon.com/it/?nc1=h_ls">Italiano</a></li> 
+        <li data-language="pt"><a href="https://aws.amazon.com/pt/?nc1=h_ls">Português</a></li> 
+       </ul> 
+      </div> 
+      <div class="lb-col lb-tiny-24 lb-mid-12"> 
+       <ul class="lb-txt-none lb-ul lb-list-style-none lb-tiny-ul-block"> 
+        <li data-language="vi"><a href="https://aws.amazon.com/vi/?nc1=f_ls">Tiếng Việt</a></li> 
+        <li data-language="tr"><a href="https://aws.amazon.com/tr/?nc1=h_ls">Türkçe</a></li> 
+        <li data-language="ru"><a href="https://aws.amazon.com/ru/?nc1=h_ls">Ρусский</a></li> 
+        <li data-language="th"><a href="https://aws.amazon.com/th/?nc1=f_ls">ไทย</a></li> 
+        <li data-language="jp"><a href="https://aws.amazon.com/jp/?nc1=h_ls">日本語</a></li> 
+        <li data-language="ko"><a href="https://aws.amazon.com/ko/?nc1=h_ls">한국어</a></li> 
+        <li data-language="cn"><a href="https://aws.amazon.com/cn/?nc1=h_ls">中文 (简体)</a></li> 
+        <li data-language="tw"><a href="https://aws.amazon.com/tw/?nc1=h_ls">中文 (繁體)</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="lb-popover lb-popover-aui lb-popover-tiny" data-lb-comp="popover" data-id="popover-my-account" data-action="hover" data-position="top"> 
+     <ul class="lb-txt-none lb-ul lb-list-style-none lb-tiny-ul-block"> 
+      <li><a href="https://console.aws.amazon.com/?nc2=h_m_mc">AWS Management Console</a></li> 
+      <li><a href="https://console.aws.amazon.com/billing/home#/account?nc2=h_m_ma">Account Settings</a></li> 
+      <li><a href="https://console.aws.amazon.com/billing/home?nc2=h_m_bc">Billing &amp; Cost Management</a></li> 
+      <li><a href="https://console.aws.amazon.com/iam/home?nc2=h_m_sc#security_credential">Security Credentials</a></li> 
+      <li><a href="https://phd.aws.amazon.com/?nc2=h_m_sc">AWS Personal Health Dashboard</a></li> 
+     </ul> 
+    </div> 
+    <div class="lb-popover lb-popover-aui lb-popover-tiny" data-lb-comp="popover" data-id="popover-support-selector" data-action="hover" data-position="top"> 
+     <ul class="lb-txt-none lb-ul lb-list-style-none lb-tiny-ul-block"> 
+      <li><a href="https://console.aws.amazon.com/support/home/?nc2=h_ql_cu">Support Center</a></li> 
+      <li><a href="https://aws.amazon.com/premiumsupport/knowledge-center/?nc2=h_m_ma">Knowledge Center</a></li> 
+      <li><a href="https://aws.amazon.com/premiumsupport/?nc2=h_m_bc">AWS Support Overview</a></li> 
+     </ul> 
+    </div> 
+    <script type="text/x-handlebars-template" data-hbs-template-path="nav-desktop/suggestions" data-hbs-context="{&quot;pricingText&quot;:&quot;Pricing&quot;,&quot;documentationText&quot;:&quot;Documentation&quot;,&quot;calculatorText&quot;:&quot;Calculator&quot;}"></script> 
+    <script type="text/x-handlebars-template" data-hbs-template-path="nav-desktop/products-head" data-hbs-context="{&quot;productsText&quot;:&quot;Products&quot;}"></script> 
+    <script type="text/x-handlebars-template" data-hbs-template-path="nav-desktop/keypages-head" data-hbs-context="{&quot;relatedPagesText&quot;:&quot;Related Pages&quot;}"></script> 
+    <script type="text/x-handlebars-template" data-hbs-template-path="nav-desktop/tutorials-head" data-hbs-context="{&quot;tutorialsText&quot;:&quot;Tutorials&quot;}"></script> 
+    <script type="text/x-handlebars-template" data-hbs-template-path="nav-desktop/blogs-head" data-hbs-context="{&quot;blogsText&quot;:&quot;Blogs&quot;}"></script> 
+    <script type="text/x-handlebars-template" data-hbs-template-path="nav-desktop/see-all" data-hbs-context="{&quot;resultsText&quot;:&quot;See more results for&quot;}"></script> 
+   </div> 
+   <div id="m-nav-mobile" class="m-nav-mobile"> 
+    <div id="m-nav-mobile-header" class="m-nav-mobile-header" data-menu-url="https://s0.awsstatic.com/en_US/nav/v3/panel-content/mobile/index.html"> 
+     <div class="lb-bg-logo aws-amazon_web_services_smile-header-mobile-en"> 
+      <a href="https://aws.amazon.com/?nc2=h_lg"><span>Click here to return to Amazon Web Services homepage</span></a> 
+     </div> 
+     <div class="m-nav-mobile-button-group"> 
+      <i class="m-nav-mobile-button icon-search"></i> 
+      <i class="m-nav-mobile-button icon-reorder"></i> 
+     </div> 
+    </div> 
+    <div id="m-nav-mobile-search" class="m-nav-mobile-search"> 
+     <form action="https://aws.amazon.com/search" role="search"> 
+      <div class="m-typeahead"> 
+       <input class="m-nav-search-field" placeholder="Search" autocomplete="off" spellcheck="false" dir="auto" type="text" name="searchQuery"> 
+      </div> 
+     </form> 
+    </div> 
+    <nav id="m-nav-trimdown" role="navigation"> 
+     <ul class="m-nav-mobile-menu-group"> 
+      <li> <a href="https://reinvent.awsevents.com/?nc2=h_mo">re:Invent</a> </li> 
+      <li> <a href="https://aws.amazon.com/products/?nc2=h_mo">Products</a> </li> 
+      <li> <a href="https://aws.amazon.com/solutions/?nc2=h_mo">Solutions</a> </li> 
+      <li> <a href="https://aws.amazon.com/pricing/?nc2=h_mo">Pricing</a> </li> 
+      <li> <a href="https://aws.amazon.com/what-is-aws/?nc2=h_mo">Introduction to AWS</a> </li> 
+      <li> <a href="https://aws.amazon.com/getting-started/?nc2=h_mo">Getting Started</a> </li> 
+      <li> <a href="https://aws.amazon.com/documentation/?nc2=h_mo">Documentation</a> </li> 
+      <li> <a href="https://aws.amazon.com/training/?nc2=h_mo">Training and Certification</a> </li> 
+      <li> <a href="https://aws.amazon.com/developer/?nc2=h_mo">Developer Center</a> </li> 
+      <li> <a href="https://aws.amazon.com/solutions/case-studies/?nc2=h_mo">Customer Success</a> </li> 
+      <li> <a href="https://aws.amazon.com/partners/?nc2=h_mo">Partner Network</a> </li> 
+      <li> <a href="https://aws.amazon.com/marketplace/?nc2=h_mo">AWS Marketplace</a> </li> 
+      <li> <a href="https://console.aws.amazon.com/support/home?nc2=h_ql_cu">Support</a> </li> 
+      <li> <a href="https://console.aws.amazon.com/console/home">Log into Console</a> </li> 
+      <li> <a href="https://aws.amazon.com/console/mobile/">Download the Mobile App</a> </li> 
+     </ul> 
+    </nav> 
+   </div> 
+  </header> 
+  <div class="awsm"> 
+   <div class="lb-blog-nav" data-lb-comp="aws-blog:blog-nav"> 
+    <div class="lb-row lb-row-max-xlarge lb-snap"> 
+     <div class="lb-blog-nav-content"> 
+      <div class="lb-blog-nav-links"> 
+       <a class="lb-txt-none lb-txt" href="/blogs"> Blog Home</a> 
+       <a class="lb-txt-none lb-txt lb-has-trigger-indicator" href="/blogs" data-lb-popover-trigger="blog-category" data-trk-params="{&quot;trkOverrideWithQs&quot;:true}"> Category&nbsp; <i class="icon-caret-down lb-trigger-mount"></i></a> 
+       <a class="lb-txt-none lb-txt lb-has-trigger-indicator" href="/blogs" data-lb-popover-trigger="blog-editions"> Edition&nbsp; <i class="icon-caret-down lb-trigger-mount"></i></a> 
+       <a class="lb-txt-none lb-txt lb-has-trigger-indicator" href="/blogs" data-lb-popover-trigger="blog-follow"> Follow&nbsp; <i class="icon-caret-down lb-trigger-mount"></i></a> 
+      </div> 
+      <div class="lb-blog-nav-search"> 
+       <form action="https://aws.amazon.com/search" role="search"> 
+        <input type="hidden" name="facet_type" value="blogs"> 
+        <input type="hidden" name="sortResults" value="modification_date desc"> 
+        <div class="lb-search-input"> 
+         <input name="q" type="text" placeholder="Search Blogs"> 
+         <div class="lb-blog-search-button"> 
+          <button class="icon-search" type="submit"></button> 
+         </div> 
+        </div> 
+       </form> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="lb-popover lb-popover-aui lb-popover-xlarge" data-lb-comp="popover" data-id="blog-category" data-action="hover" data-position="top"> 
+    <div class="lb-grid lb-row lb-row-max-large lb-snap"> 
+     <div class="lb-col lb-tiny-24 lb-mid-12"> 
+      <div class="lb-none-pad lb-none-v-margin lb-box"> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/architecture/"> Architecture</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/aws-cloud-financial-management/"> AWS Cloud Financial Management</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/mt/" data-trk-params="{&quot;trkOverrideWithQs&quot;:true}"> AWS Cloud Operations &amp; Migrations</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/apn/"> AWS Partner Network</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/podcasts/aws-podcast/?sc_ichannel=ha&amp;sc_icampaign=acq_awsblognav&amp;sc_icontent=categorynav"> AWS Podcast</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/awsmarketplace/"> AWS Marketplace</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/aws/"> AWS News</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/"> Big Data</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/business-productivity/"> Business Productivity</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/compute/"> Compute</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/contact-center/"> Contact Center</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/containers/"> Containers</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/database/"> Database</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/desktop-and-application-streaming/"> Desktop &amp; Application Streaming</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/developer/"> Developer</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/devops/"> DevOps</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/enterprise-strategy/"> Enterprise Strategy</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/mobile/"> Front-End Web &amp; Mobile</a> 
+      </div> 
+     </div> 
+     <div class="lb-col lb-tiny-24 lb-mid-12"> 
+      <div class="lb-none-pad lb-none-v-margin lb-box"> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/gametech/"> Game Tech</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/hpc/"> HPC</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/infrastructure-and-automation/"> Infrastructure &amp; Automation</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/industries/"> Industries</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/iot/"> Internet of Things</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/machine-learning/"> Machine Learning</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/media/"> Media</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/messaging-and-targeting/"> Messaging &amp; Targeting</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/networking-and-content-delivery/"> Networking &amp; Content Delivery</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/opensource/"> Open Source</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/publicsector/"> Public Sector</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/quantum-computing/" data-trk-params="{&quot;trkOverrideWithQs&quot;:true}"> Quantum Computing</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/robotics/"> Robotics</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/awsforsap/"> SAP</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/security/"> Security, Identity, &amp; Compliance</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/startups/"> Startups</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/storage/"> Storage</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/training-and-certification/"> Training &amp; Certification</a> 
+       <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/modernizing-with-aws/"> Windows on AWS</a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="lb-popover lb-popover-aui lb-popover-tiny" data-lb-comp="popover" data-id="blog-editions" data-action="hover" data-position="top"> 
+    <div class="lb-none-pad lb-box"> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/cn/blogs/china/"> 中国版</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/fr/blogs/france/"> Édition Française</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/de/blogs/germany/"> Deutsche Edition</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/jp/blogs/news/"> 日本版</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/ko/blogs/korea/"> 한국 에디션</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/pt/blogs/aws-brasil/" data-trk-params="{&quot;trkOverrideWithQs&quot;:true}"> Edição em Português</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/es/blogs/aws-spanish/" data-trk-params="{&quot;trkOverrideWithQs&quot;:true}"> Edición en Español</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/"> English Edition</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/ru/blogs/rus/"> Версия на русском</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/id/blogs/indonesia/"> Edisi Bahasa Indonesia</a> 
+     <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/tr/blogs/turkey/"> Türkçe Sürüm</a> 
+    </div> 
+   </div> 
+   <div class="lb-popover lb-popover-aui lb-popover-tiny" data-lb-comp="popover" data-id="blog-follow" data-action="hover" data-position="top"> 
+    <div class="lb-none-pad lb-box"> 
+     <a class="lb-txt-none lb-txt" href="https://pages.awscloud.com/communication-preferences?sc_ichannel=ha&amp;sc_icampaign=multi_emailoptin&amp;sc_isegment=en&amp;sc_iplace=fl-nav&amp;sc_icontent=subscribe_for_updates&amp;trkCampaign=EmailOptin&amp;trk=blog"> Mailing List</a> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="aws-page-content" class="aws-blog-has-related-posts lb-page-content lb-page-with-sticky-subnav blog-page" data-page-alert-target="true"> 
+   <div class="aws-blog-related-posts" data-lb-comp="aws-blog:related-items" data-directory-id="blog-posts" data-related-tags="[&quot;blog-posts#category-networking-content-delivery#amazon-cloudfront&quot;,&quot;blog-posts#category#big-data&quot;]" data-current-item="blog-posts#33-6179" data-order-by="SortOrderValue" data-number-of-items="8"> 
+    <div class="aws-directories-container"></div> 
+    <script type="text/x-handlebars-template">
+    <h4>Related Posts</h4>
+    <aside>
+      <nav>
+        <ul>
+          {{#each items}}
+            <li><a href="{{track_url additionalFields.link 'b_rp'}}">{{{additionalFields.title}}}</a></li>
+          {{/each}}
+        </ul>
+      </nav>
+    </aside>
+  </script> 
+   </div> 
+   <div class="aws-blog-content lb-row lb-row-max-large lb-snap lb-gutter-mid"> 
+    <main class="lb-col lb-tiny-24 lb-mid-16" role="main"> 
+     <h2 class="lb-h5 blog-title"><a href="https://aws.amazon.com/blogs/big-data/">AWS Big Data Blog</a></h2> 
+     <article class="blog-post" vocab="http://schema.org/" typeof="TechArticle"> 
+      <meta property="inLanguage" content="en-US"> 
+      <meta property="image" content="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront3.jpg"> 
+      <h1 class="lb-h2 blog-post-title" property="name headline">Analyze your Amazon CloudFront access logs at scale</h1> 
+      <footer class="blog-post-meta" data-lb-comp="aws-blog:share-dialog">
+        by 
+       <span property="author" typeof="Person"><span property="name">Steffen Grunwald</span></span> | on 
+       <time property="datePublished" datetime="2018-12-21T11:01:36-07:00">21 DEC 2018</time> | in 
+       <span class="blog-post-categories"><a href="https://aws.amazon.com/blogs/big-data/category/networking-content-delivery/amazon-cloudfront/" title="View all posts in Amazon CloudFront"><span property="articleSection">Amazon CloudFront</span></a>, <a href="https://aws.amazon.com/blogs/big-data/category/big-data/" title="View all posts in AWS Big Data"><span property="articleSection">AWS Big Data</span></a></span> | 
+       <a href="https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" property="url">Permalink</a> | 
+       <a id="aws-comment-trigger-6179" href="https://commenting.awsblogs.com/embed.html?disqus_shortname=aws-big-data-blog&amp;disqus_identifier=6179&amp;disqus_title=Analyze+your+Amazon+CloudFront+access+logs+at+scale&amp;disqus_url=https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" data-lb-comp="aws-blog:commenting" data-sandbox-attr="allow-forms allow-scripts allow-popups allow-same-origin" property="discussionUrl"><i class="icon-comment"></i> Comments</a> | 
+       <a href="#" role="button" data-share-dialog-toggle><span class="span icon-share"></span>&nbsp;Share</a> 
+       <div class="blog-share-dialog" data-share-dialog style="display: none;"> 
+        <ul> 
+         <li> <a class="lb-txt" href="https://www.facebook.com/sharer/sharer.php?u=https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" target="_blank" rel="noopener noreferrer"><span class="icon-facebook-square" aria-label="Share on Facebook"></span></a> </li> 
+         <li> <a class="lb-txt" href="https://twitter.com/intent/tweet/?text=Analyze%20your%20Amazon%20CloudFront%20access%20logs%20at%20scale&amp;via=awscloud&amp;url=https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" target="_blank" rel="noopener noreferrer"><span class="icon-twitter-square" aria-label="Share on Twitter"></span></a> </li> 
+         <li> <a class="lb-txt" href="https://www.linkedin.com/shareArticle?mini=true&amp;title=Analyze%20your%20Amazon%20CloudFront%20access%20logs%20at%20scale&amp;source=Amazon%20Web%20Services&amp;summary=This%20blog%20post%20focuses%20on%20two%20measures%20to%20restructure%20Amazon%20CloudFront%20access%20logs%20for%20optimization%3A%20partitioning%20and%20conversion%20to%20columnar%20formats.%20For%20more%20details%20on%20performance%20tuning%20read%20the%20blog%20post%20about%20the%20top%2010%20performance%20tuning%20tips%20for%20Amazon%20Athena.&amp;url=https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" target="_blank" rel="noopener noreferrer"><span class="icon-linkedin-square" aria-label="Share on LinkedIn"></span></a> </li> 
+         <li> <a class="lb-txt" href="mailto:?subject=Analyze%20your%20Amazon%20CloudFront%20access%20logs%20at%20scale&amp;body=Analyze%20your%20Amazon%20CloudFront%20access%20logs%20at%20scale%0A%0Ahttps://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" target="_blank" rel="noopener noreferrer"><span class="icon-envelope-square" aria-label="Share on Email"></span></a> </li> 
+         <li class="blog-share-dialog-url"><input type="text" value="https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" title="Link to Analyze your Amazon CloudFront access logs at scale" readonly data-share-dialog-url></li> 
+        </ul> 
+       </div> 
+      </footer> 
+      <section class="blog-post-content" property="articleBody"> 
+       <p>Many AWS customers are using&nbsp;<a href="https://aws.amazon.com/cloudfront/" target="_blank" rel="noopener">Amazon CloudFront</a>, a global content delivery network (CDN) service. It delivers websites, videos, and API operations to browsers and clients with low latency and high transfer speeds.&nbsp;Amazon CloudFront protects your backends from massive load or malicious requests by caching or a web application firewall. As a result, sometimes only a small fraction of all requests gets to your backends. You can configure Amazon CloudFront to store access logs&nbsp;with detailed information of every request to&nbsp;<a href="https://aws.amazon.com/s3/" target="_blank" rel="noopener">Amazon Simple Storage Service</a>&nbsp;(S3). This lets you gain insight into your cache efficiency and learn how your customers are using your products.</p> 
+       <p>A common choice to run standard SQL queries on your data in S3 is&nbsp;<a href="https://aws.amazon.com/athena/" target="_blank" rel="noopener">Amazon Athena</a>.&nbsp;Queries analyze your data immediately without the prior setup of infrastructure or loading your data.&nbsp;You pay only for the queries that you run. Amazon Athena is ideal for quick, interactive querying. It supports complex analysis of your data, including large joins, unions, nested queries, and window functions.</p> 
+       <p>This blog post shows you how you can restructure your Amazon CloudFront access logs storage to optimize the cost and performance for queries. It demonstrates&nbsp;<strong>common patterns</strong> that are also applicable to other sources of <strong>time series</strong> data.</p> 
+       <h2>Optimizing Amazon CloudFront access logs for Amazon Athena queries</h2> 
+       <p>There are two main aspects to optimize: cost and performance.</p> 
+       <p><strong>Cost</strong>&nbsp;should be low for both storage of your data and the queries. Access logs are stored in S3, which is billed by GB/ month. Thus, it makes sense to&nbsp;<em>compress</em>&nbsp;your data – especially when you want to keep your logs for a long time. Also cost incurs on queries. When you optimize the storage cost, usually the query cost follows. Access logs are delivered compressed by gzip and Amazon Athena can deal with compression. Amazon Athena is billed by the amount of compressed data scanned, so the benefits of compression are passed on to you as cost savings.</p> 
+       <p>Queries further benefit from <em>partitioning</em>. Partitioning divides your table into parts and keeps the related data together based on column values. For time-based queries, you benefit from partitioning by year, month, day, and hour. In Amazon CloudFront access logs, this indicates the request time. Depending on your data and queries, you add further dimensions to partitions. For example, for access logs it could be the domain name that was requested. When querying your data, you specify filters based on the partition to make Amazon Athena scan less data.</p> 
+       <p>Generally, <strong>performance</strong>&nbsp;improves by scanning less data. Conversion of your access logs to&nbsp;<em>columnar formats</em>&nbsp;reduces the data to scan significantly. Columnar formats retain all information but store values by column. This allows creation of dictionaries, and effective use of Run Length Encoding and other compression techniques. Amazon Athena can further optimize the amount of data to read, because it does not scan columns at all if a column is not used in a filter or the result of a query. Columnar formats also split a file into chunks and calculate metadata on file- and chunk level like the range (min/ max), count, or sum of values. If the metadata indicates that the file or chunk is not relevant for the query Amazon Athena skips it. In addition, if you know your queries and the information you are looking for, you can further <em>aggregate</em>&nbsp;your data (for example, by day) for improved performance of frequent queries.</p> 
+       <p>This blog post focuses on two measures to restructure Amazon CloudFront access logs for optimization:&nbsp;<strong>partitioning</strong> and conversion to<strong> columnar formats</strong>. For more details on performance tuning read the blog post about the <a href="https://aws.amazon.com/blogs/big-data/top-10-performance-tuning-tips-for-amazon-athena/" target="_blank" rel="noopener">top 10 performance tuning tips for Amazon Athena</a>.</p> 
+       <p>This blog post describes the concepts of a solution and includes code excerpts for better illustration of the implementation. Visit the AWS Samples repository&nbsp;for a fully working implementation of the concepts. Launching the packaged sample application from the&nbsp;<u><a href="https://serverlessrepo.aws.amazon.com/applications" target="_blank" rel="noopener">AWS Serverless Application Repository</a></u>, you deploy it within minutes in one step:</p> 
+       <p><a href="https://serverlessrepo.aws.amazon.com/#/applications/arn:aws:serverlessrepo:us-east-1:387304072572:applications~amazon-cloudfront-access-logs-queries" target="_blank" rel="noopener"><img class="alignnone size-full wp-image-5580" src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/09/07/LaunchStack.png" alt="" width="234" height="60"></a></p> 
+       <p><span id="more-6179"></span></p> 
+       <h2>Partitioning CloudFront Access Logs in S3</h2> 
+       <p>Amazon CloudFront delivers each access log file in CSV format to an S3 bucket of your choice. Its name adheres to the following format (for more information, see&nbsp;<a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html" target="_blank" rel="noopener">Configuring and Using Access Logs</a>):</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-code">/optional-prefix/distribution-ID.YYYY-MM-DD-HH.unique-ID.gz</code></pre> 
+       </div> 
+       <p>The file name includes the date and time of the period in which the requests occurred in Coordinated Universal time (UTC). Although you can specify an optional prefix for an Amazon CloudFront distribution, all access log files for a distribution are stored with the same prefix.</p> 
+       <p>When you have a large amount of access log data, this makes it hard to only scan and process parts of it efficiently. Thus, you must partition your data. Most tools in the big data space (for example, the Apache Hadoop ecosystem, Amazon Athena, <a href="https://aws.amazon.com/glue/?hp=tile&amp;so-exp=below" target="_blank" rel="noopener">AWS Glue</a>) can deal with partitioning using the&nbsp;<a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-AlterPartition" target="_blank" rel="noopener">Apache Hive</a>&nbsp;style. A partition is a directory that is self-descriptive. The directory name not only reflects the value of a column but also the column name. For access logs this is a desirable structure:</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-code">/optional-prefix/year=YYYY/month=MM/day=DD/hour=HH/distribution-ID.YYYY-MM-DD-HH.unique-ID.gz</code></pre> 
+       </div> 
+       <p>To generate this structure, the sample application initiates the processing of each file by an S3 event notification. As soon as Amazon CloudFront puts a new access log file to an S3 bucket, an event triggers the AWS Lambda function&nbsp;<code>moveAccessLogs</code>. This moves the file to a prefix corresponding to the filename. Technically, the move is a copy followed by deletion of the original file.</p> 
+       <p>&nbsp;</p> 
+       <p><img class="alignnone size-full wp-image-6181" style="margin: 20px 0px 20px 0px" src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront1.jpg" alt="" width="800" height="497"></p> 
+       <p>&nbsp;</p> 
+       <h3>Migration of your Amazon CloudFront Access Logs</h3> 
+       <p>The deployment of the sample application contains a single S3 bucket called&nbsp;<code>&lt;StackName&gt;-cf-access-logs.</code>&nbsp;You&nbsp;can modify your existing Amazon CloudFront distribution configuration to deliver access logs to this bucket with the&nbsp;<code>new/</code> log prefix. Files are moved to the canonical file structure for Amazon Athena partitioning as soon as they are put into the bucket.</p> 
+       <p>To migrate all previous access log files, copy them manually to the&nbsp;<code>new/</code>&nbsp;folder in the bucket. For example, you could copy the files by using the <a href="https://aws.amazon.com/cli/?nc2=h_m1" target="_blank" rel="noopener">AWS Command Line Interface (AWS CLI)</a>. These files are treated the same way as the incoming files by Amazon CloudFront.</p> 
+       <h3>Load the Partitions and query your Access Logs</h3> 
+       <p>Before you can query the access logs in your bucket with Amazon Athena the&nbsp;AWS Glue Data Catalog needs metadata. On deployment, the sample application creates a table with the definition of the&nbsp;schema and the location. The new table is created&nbsp;by adding the partitioning information to the&nbsp;<code>CREATE TABLE</code>&nbsp;statement from the&nbsp;<a href="https://docs.aws.amazon.com/athena/latest/ug/cloudfront-logs.html#create-cloudfront-table" target="_blank" rel="noopener">Amazon CloudFront documentation</a>&nbsp;(mind the <code>PARTITIONED BY</code> clause):</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">CREATE EXTERNAL TABLE IF NOT EXISTS
+    cf_access_logs.partitioned_gz (
+         date DATE,
+         time STRING,
+         location STRING,
+         bytes BIGINT,
+         requestip STRING,
+         method STRING,
+         host STRING,
+         uri STRING,
+         status INT,
+         referrer STRING,
+         useragent STRING,
+         querystring STRING,
+         cookie STRING,
+         resulttype STRING,
+         requestid STRING,
+         hostheader STRING,
+         requestprotocol STRING,
+         requestbytes BIGINT,
+         timetaken FLOAT,
+         xforwardedfor STRING,
+         sslprotocol STRING,
+         sslcipher STRING,
+         responseresulttype STRING,
+         httpversion STRING,
+         filestatus STRING,
+         encryptedfields INT 
+)
+PARTITIONED BY(
+         year string,
+         month string,
+         day string,
+         hour string )
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+LOCATION 's3://&lt;StackName&gt;-cf-access-logs/partitioned-gz/'
+TBLPROPERTIES ( 'skip.header.line.count'='2');</code></pre> 
+       </div> 
+       <p>You can load the partitions&nbsp;added so far by running the metastore check (<code>msck</code>) statement via the Amazon <a href="https://console.aws.amazon.com/athena/home#query" target="_blank" rel="noopener">Athena query editor.</a> It discovers the partition structure in S3 and adds partitions to the metastore.</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">msck repair table cf_access_logs.partitioned_gz</code></pre> 
+       </div> 
+       <p>You are now ready for your first query on your data in the&nbsp;Amazon Athena query editor:</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">SELECT SUM(bytes) AS total_bytes
+FROM cf_access_logs.partitioned_gz
+WHERE year = '2017'
+AND month = '10'
+AND day = '01'
+AND hour BETWEEN '00' AND '11';</code></pre> 
+       </div> 
+       <p>This query does not specify the request date (called&nbsp;<code>date</code>&nbsp;in a previous example) column of the table but the columns used for partitioning. These columns are dependent on&nbsp;<code>date</code>&nbsp;but the table definition does not specify this relationship. When you specify only the request date column, Amazon Athena scans every file as there is no hint which files contain the relevant rows and which files do not. By specifying the partition columns, Amazon Athena scans only a small subset of the total amount of Amazon CloudFront access log files. This optimizes both the performance and the cost of your queries. You can add further columns to the&nbsp;<code>WHERE</code>&nbsp;clause, such as the <code>time</code>&nbsp;to further narrow down the results.</p> 
+       <p>To save cost, consider narrowing the scope of partitions down to a minimum by also putting the partitioning columns into the&nbsp;<code>WHERE</code>&nbsp;clause. You validate the approach by observing the amount of data that was scanned in the&nbsp;<a href="https://docs.aws.amazon.com/athena/latest/APIReference/API_QueryExecutionStatistics.html" target="_blank" rel="noopener">query execution statistics</a>&nbsp;for your queries. These statistics are also displayed in the Amazon Athena query editor after your statement has been run:</p> 
+       <p><img class="alignnone size-full wp-image-6183" style="margin: 20px 0px 20px 0px;border: 1px solid #cccccc" src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront2.jpg" alt="" width="800" height="157"></p> 
+       <h3>Adding Partitions continuously</h3> 
+       <p>As Amazon CloudFront continuously delivers new access log data for requests, new prefixes for partitions are created in S3. However, Amazon Athena only queries the files contained in the known partitions, i.e. partitions that have been added before to the metastore. That’s why periodically triggering the&nbsp;<code>msck</code>&nbsp;command would not be the best solution. First, it is a time-consuming operation since Amazon Athena scans all S3 paths to validate and load your partitions. More importantly, this way you only add&nbsp;partitions that already have data delivered. Thus, there is some time period when the data exists in S3 but is not visible to Amazon Athena queries yet.</p> 
+       <p>The sample application solves this by adding the partition for each hour in advance because partitions are just dependent on the request time. This way Amazon Athena scans files as soon as they exist in S3. A scheduled AWS Lambda function runs a statement like this:</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-java">ALTER TABLE cf_access_logs.partitioned_gz
+ADD IF NOT EXISTS 
+PARTITION (
+    year = '2017',
+    month = '10',
+    day = '01',
+    hour = '02' );</code></pre> 
+       </div> 
+       <p>It can omit the specification of the canonical&nbsp;<code>location</code>&nbsp;attribute in this statement as it is automatically derived from the column values.</p> 
+       <h2>Conversion of the Access Logs to a Columnar Format</h2> 
+       <p>As mentioned previously, with columnar formats Amazon Athena skips scanning of data not relevant for a query resulting in less cost. Amazon Athena currently supports the columnar formats Apache ORC and Apache Parquet.</p> 
+       <p>Key to the conversion is the Amazon Athena&nbsp;<code>CREATE TABLE AS SELECT</code>&nbsp;(<a href="https://docs.aws.amazon.com/athena/latest/ug/ctas.html" target="_blank" rel="noopener">CTAS</a>) feature. A CTAS query creates a new table from the results of another&nbsp;<code>SELECT</code>&nbsp;query. Amazon Athena stores data files created by the CTAS statement in a specified location in Amazon S3. You can use CTAS to aggregate or transform the data, and to convert it into columnar formats. The sample application uses CTAS to hourly rewrite all logs from the CSV format to the Apache Parquet format. After this the resulting data will be added to a single partitioned table (the <em>target table</em>).</p> 
+       <h3>Creating the Target Table in Apache Parquet Format</h3> 
+       <p>The target table is a slightly modified version of the <code>partitioned_gz</code>&nbsp;table. Besides a different location the following table shows the different Serializer/Deserializer (SerDe) configuration for Apache Parquet:</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">CREATE EXTERNAL TABLE `cf_access_logs.partitioned_parquet`(
+  `date` date, 
+  `time` string, 
+  `location` string, 
+  `bytes` bigint, 
+  `requestip` string, 
+  `method` string, 
+  `host` string, 
+  `uri` string, 
+  `status` int, 
+  `referrer` string, 
+  `useragent` string, 
+  `querystring` string, 
+  `cookie` string, 
+  `resulttype` string, 
+  `requestid` string, 
+  `hostheader` string, 
+  `requestprotocol` string, 
+  `requestbytes` bigint, 
+  `timetaken` float, 
+  `xforwardedfor` string, 
+  `sslprotocol` string, 
+  `sslcipher` string, 
+  `responseresulttype` string, 
+  `httpversion` string, 
+  `filestatus` string, 
+  `encryptedfields` int)
+PARTITIONED BY ( 
+  `year` string, 
+  `month` string, 
+  `day` string, 
+  `hour` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://&lt;StackName&gt;-cf-access-logs/partitioned-parquet'
+TBLPROPERTIES (
+  'has_encrypted_data'='false', 
+  'parquet.compression'='SNAPPY')</code></pre> 
+       </div> 
+       <h3>Transformation to Apache Parquet by the CTAS Query</h3> 
+       <p>The sample application provides a scheduled AWS Lambda function <code>transformPartition</code> that runs a CTAS query on a single partition per run, taking one hour of data into account.&nbsp;The target location for the Apache Parquet files is the Apache Hive style path in the location of the&nbsp;<code>partitioned_parquet</code>&nbsp;table.</p> 
+       <p>&nbsp;</p> 
+       <p><img class="alignnone size-full wp-image-6184" style="margin: 20px 0px 20px 0px" src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront3.jpg" alt="" width="800" height="446"></p> 
+       <p>&nbsp;</p> 
+       <p>The files written to S3 are important but the table in the AWS Glue Data Catalog for this data is just a by-product. Hence the&nbsp;function drops the CTAS table immediately and create the corresponding partition in the&nbsp;<code>partitioned_parquet</code>&nbsp;table instead.</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">CREATE TABLE cf_access_logs.ctas_2017_10_01_02
+WITH ( format='PARQUET',
+    external_location='s3://&lt;StackName&gt;-cf-access-logs/partitioned_parquet/year=2017/month=10/day=01/hour=02',
+    parquet_compression = 'SNAPPY')
+AS SELECT *
+FROM cf_access_logs.partitioned_gz
+WHERE year = '2017'
+    AND month = '10'
+    AND day = '01'
+    AND hour = '02';
+
+DROP TABLE cf_access_logs.ctas_2017_10_01_02;
+
+ALTER TABLE cf_access_logs.partitioned_parquet
+ADD IF NOT EXISTS 
+PARTITION (
+    year = '2017',
+    month = '10',
+    day = '01',
+    hour = '02' );</code></pre> 
+       </div> 
+       <p>The statement should be run as soon as new data is written. Amazon CloudFront usually delivers the log file for a time period to your Amazon S3 bucket within an hour of the events that appear in the log. The sample application schedules the&nbsp;<code>transformPartition</code>&nbsp;function hourly to transform the data&nbsp;for the hour before the previous hour.</p> 
+       <p>Some or all log file entries for a time period can sometimes be delayed by up to 24 hours. If you must mitigate this case, you delete and recreate a partition after that period. Also if you migrated partitions from previous Amazon CloudFront access logs, run the&nbsp;<code>transformPartition</code>&nbsp;function for each partition. The sample applications only transforms continuously added files.</p> 
+       <p>When all files of a gzip partition are converted to Apache Parquet, you can save cost by getting rid of data that you do not need. Use the <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html" target="_blank" rel="noopener">Lifecycle Policies</a> in S3 to archive the gzip files in a cheaper storage class or delete them after a specific amount of days.</p> 
+       <h3>Query data over Multiple Tables</h3> 
+       <p>You now have two derived tables from the original Amazon CloudFront access log data:</p> 
+       <ul> 
+        <li><strong>partitioned_gz </strong>contains gzip compressed CSV files that are added as soon as new files are delivered.</li> 
+        <li>Access logs in&nbsp;<strong>partitioned_parquet </strong>are written after one hour latest. A rough assumption is that the CTAS query takes a maximum of 15 minutes to transform a gzip partition. You must measure and confirm this assumption. Depending on the data size, this can be much faster.</li> 
+       </ul> 
+       <p>The following diagram&nbsp;shows how the complete view on all data is composed of the two tables. The last complete partition of Apache Parquet files ends before the current time minus the transformation duration and the duration until Amazon CloudFront delivers the access log files.</p> 
+       <p><img class="alignnone size-full wp-image-6185" style="margin: 20px 0px 20px 0px" src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/19/AnalyzeCloudFront4.jpg" alt="" width="800" height="255"></p> 
+       <p>For convenience the sample application creates the Amazon Athena view&nbsp;<code>combined</code> as a union of both tables. It includes an additional column called&nbsp;<code>file</code>.&nbsp;This is the file that stores the row.</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">CREATE OR REPLACE VIEW cf_access_logs.combined AS
+SELECT *, "$path" AS file
+FROM cf_access_logs.partitioned_gz
+WHERE concat(year, month, day, hour) &gt;=
+       date_format(date_trunc('hour', (current_timestamp -
+       INTERVAL '15' MINUTE - INTERVAL '1' HOUR)), '%Y%m%d%H')
+UNION ALL SELECT *, "$path" AS file
+FROM cf_access_logs.partitioned_parquet
+WHERE concat(year, month, day, hour) &lt;
+       date_format(date_trunc('hour', (current_timestamp -
+       INTERVAL '15' MINUTE - INTERVAL '1' HOUR)), '%Y%m%d%H')</code></pre> 
+       </div> 
+       <p>Now you can query the data from the view to take advantage of the columnar based file partitions automatically. As mentioned before, you should add the partition columns (<code>year, month, day, hour</code>) to your statement to limit the files Amazon Athena scans.</p> 
+       <div class="hide-language"> 
+        <pre><code class="lang-sql">SELECT SUM(bytes) AS total_bytes
+FROM cf_access_logs.combined
+WHERE year = '2017'
+   AND month = '10'
+   AND day = '01'
+</code></pre> 
+       </div> 
+       <h2>Summary</h2> 
+       <p>In this blog post, you learned how to optimize the cost and performance of your Amazon Athena queries with two steps. First, you divide the overall data into small partitions. This allows queries to run much faster by reducing the number of files to scan. The second step converts each partition into a columnar format to reduce storage cost and increase the efficiency of scans by Amazon Athena.</p> 
+       <p>The results of both steps are combined in a single view for convenient interactive queries by you or your application. All data is partitioned by the time of the request. Thus, this format is best suited for interactive drill-downs into your logs for which the columns are limited and the time range is known. This way, it complements the <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/reports.html" target="_blank" rel="noopener">Amazon CloudFront reports</a>, for example, by providing easy access to:</p> 
+       <ul> 
+        <li>Data from more than 60 days in the past</li> 
+        <li>The distribution of detailed HTTP status codes (for example, 200, 403, 404) on a certain day or hour</li> 
+        <li>Statistics based on the URI paths</li> 
+        <li>Statistics of objects that are not listed in Amazon CloudFront’s 50 most popular objects report</li> 
+        <li>A drill down into the attributes of each request</li> 
+       </ul> 
+       <p>We hope you find this blog post and the sample application useful also for other types of time series data beside Amazon CloudFront access logs. Feel free to submit enhancements to the example application in the source repository or provide feedback in the comments.</p> 
+       <p>&nbsp;</p> 
+       <hr> 
+       <h3>About the Author</h3> 
+       <p><img class="size-full wp-image-6190 alignleft" src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2018/12/20/SteffenG.png" alt="" width="113" height="151"> <strong>Steffen Grunwald is a senior solutions architect with Amazon Web Services. </strong>Supporting German enterprise customers on their journey to the cloud, he loves to dive deep into application architectures and development processes to drive performance, operational efficiency, and increase the speed of innovation.</p> 
+       <p>&nbsp;</p> 
+       <p>&nbsp;</p> 
+       <p>&nbsp;</p> 
+       <p>&nbsp;</p> 
+       <!-- '"` --> 
+      </section> 
+      <footer> 
+       <div class="blog-tag-list">
+         TAGS: 
+        <span property="keywords"><a href="https://aws.amazon.com/blogs/big-data/tag/amazon-cloudfront/" rel="tag">Amazon Cloudfront</a></span> 
+       </div> 
+      </footer> 
+      <div class="lb-row lb-collapse aws-comment-wrapper"> 
+       <div class="lb-col lb-tiny-24 lb-push-0 lb-small-10 lb-small-push-7 lb-mid-10 lb-mid-push-7 lb-large-8 lb-large-push-8"> 
+        <a id="aws-comment-trigger-6179" href="https://commenting.awsblogs.com/embed.html?disqus_shortname=aws-big-data-blog&amp;disqus_identifier=6179&amp;disqus_title=Analyze+your+Amazon+CloudFront+access+logs+at+scale&amp;disqus_url=https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/" data-lb-comp="aws-blog:commenting" class="blog-btn-a blog-btn-a-large blog-btn-a-block" data-sandbox-attr="allow-forms allow-scripts allow-popups allow-same-origin"> <i class="icon-comment"></i> View Comments </a> 
+       </div> 
+      </div> 
+      <div class="js-mbox" data-mbox="en_blog_post_comments"></div> 
+     </article> 
+    </main> 
+    <div class="blog-sidebar lb-col lb-tiny-24 lb-mid-8"> 
+     <div class="awsm"> 
+      <div class="lb-box" style="padding-left:30px;"> 
+       <h3 id="Resources" class="lb-txt-none lb-h3 lb-title" style="margin-top:30px;"> Resources</h3> 
+       <div class="data-attr-wrapper lb-none-pad lb-none-v-margin lb-box" data-da-type="ha" data-da-channel="ha" data-da-language="en" data-da-placement="blog-sb-resources" data-da-campaign="acq_awsblogsb" data-da-content="bigdata-resources" data-da-trk="blog_initial"> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/category/analytics/amazon-athena?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-resources"> Amazon Athena</a> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/category/analytics/amazon-emr?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-resources"> Amazon EMR</a> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/category/analytics/amazon-kinesis?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-resources"> Amazon Kinesis</a> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/msk/"> Amazon MSK</a> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/category/analytics/amazon-quicksight?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-resources"> Amazon QuickSight</a> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/category/analytics/amazon-redshift-analytics?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-resources"> Amazon Redshift</a> 
+        <a class="lb-txt-none lb-txt" href="https://aws.amazon.com/blogs/big-data/category/analytics/aws-glue?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-resources"> AWS Glue</a> 
+       </div> 
+       <div class="lb-grid lb-row lb-row-max-large lb-snap"> 
+        <div class="lb-col lb-tiny-24 lb-mid-8"> 
+         <hr class="lb-divider"> 
+        </div> 
+        <div class="lb-col lb-tiny-24 lb-mid-8"> 
+        </div> 
+        <div class="lb-col lb-tiny-24 lb-mid-8"> 
+        </div> 
+       </div> 
+       <h3 id="Follow" class="lb-txt-none lb-h3 lb-title"> Follow</h3> 
+       <div class="data-attr-wrapper lb-none-pad lb-none-v-margin lb-box" data-da-type="ha" data-da-channel="ha" data-da-language="en" data-da-placement="blog-sb-social" data-da-campaign="acq_awsblogsb" data-da-content="bigdata-social" data-da-trk="blog_initial"> 
+        <a class="lb-txt-none lb-txt" href="https://twitter.com/awscloud"> <i class="icon-twitter-square"></i>&nbsp;Twitter</a> 
+        <a class="lb-txt-none lb-txt" href="https://www.facebook.com/amazonwebservices"> <i class="icon-facebook-square"></i>&nbsp;Facebook</a> 
+        <a class="lb-txt-none lb-txt" href="https://www.linkedin.com/company/amazon-web-services/"> <i class="icon-linkedin-square"></i>&nbsp;LinkedIn</a> 
+        <a class="lb-txt-none lb-txt" href="https://www.twitch.tv/aws"> <i class="icon-twitch"></i>&nbsp;Twitch</a> 
+        <a class="lb-txt-none lb-txt" href="https://pages.awscloud.com/communication-preferences?sc_ichannel=ha&amp;sc_icampaign=acq_awsblogsb&amp;sc_icontent=bigdata-social"> <i class="icon-envelope-square"></i>&nbsp;Email Updates</a> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="js-mbox" data-mbox="en_blog_post_sidebar"></div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="aws-blog-next-related-article-arrow"> 
+   <div class="aws-directories-container"></div> 
+   <script type="text/x-handlebars-template">
+    <div class="lb-article-arrow" data-next-related-item>
+      <a class="lb-widget-body" href="{{track_url items.0.additionalFields.link 'b_nrp'}}">
+        <div class="lb-content-area" >
+                    <span class="lb-article-title">{{{items.0.additionalFields.title}}}</span>
+        </div>
+        <i class="icon-chevron-right"></i>
+      </a>
+    </div>
+  </script> 
+  </div> 
+  <div class="awsm"> 
+   <footer id="aws-page-footer" class="m-page-footer" role="contentinfo"> 
+    <div data-url="https://dc.ads.linkedin.com/collect/?pid=3038&amp;fmt=gif" data-lb-comp="tracking-pixel"></div> 
+    <div data-lb-comp="google-rlsa-pixel"></div> 
+    <div class="data-attr-wrapper lb-none-v-margin lb-xb-grid-wrap" style="background-color:#242F3E;" data-da-type="so" data-da-so-type="viewport" data-da-so-language="en" data-da-so-category="monitoring" data-da-so-name="footer" data-da-so-version="a"> 
+     <div class="lb-xb-grid lb-row-max-large lb-snap lb-tiny-xb-1 lb-small-xb-3 lb-large-xb-5"> 
+      <div class="lb-xbcol"> 
+       <div class="data-attr-wrapper lb-small-hide lb-btn" data-da-type="so" data-da-so-type="viewport" data-da-so-language="en" data-da-so-category="monitoring" data-da-so-name="footer_buttons" data-da-so-url="all" data-da-so-version="footer_signin-mobile-default"> 
+        <a class="lb-btn-p-primary" href="https://console.aws.amazon.com/console/home?nc1=f_ct&amp;src=footer-signin-mobile" role="button"> <span> Sign In to the Console</span> </a> 
+       </div> 
+       <h3 id="Learn_About_AWS" class="lb-txt-none lb-txt-p-chromium lb-tiny-v-margin lb-h3 lb-title"> Learn About AWS</h3> 
+       <ul class="lb-txt-p-chromium lb-ul lb-list-style-none lb-li-micro-v-margin lb-tiny-ul-block" style="margin-bottom:0px;"> 
+        <li><a href="https://aws.amazon.com/what-is-aws/?nc1=f_cc" target="_blank" rel="noopener">What Is AWS?</a></li> 
+        <li><a href="https://aws.amazon.com/what-is-cloud-computing/?nc1=f_cc" target="_blank" rel="noopener">What Is Cloud Computing?</a></li> 
+        <li><a href="https://aws.amazon.com/diversity-inclusion/?nc1=f_cc" target="_blank" rel="noopener">AWS Inclusion, Diversity &amp; Equity</a></li> 
+        <li><a href="https://aws.amazon.com/devops/what-is-devops/?nc1=f_cc" target="_blank" rel="noopener">What Is DevOps?</a></li> 
+        <li><a href="https://aws.amazon.com/containers/?nc1=f_cc" target="_blank" rel="noopener">What Is a Container?</a></li> 
+        <li><a href="https://aws.amazon.com/big-data/datalakes-and-analytics/what-is-a-data-lake/?nc1=f_cc" target="_blank" rel="noopener">What Is a Data Lake?</a></li> 
+        <li><a href="https://aws.amazon.com/security/?nc1=f_cc" target="_blank" rel="noopener">AWS Cloud Security</a></li> 
+        <li><a href="https://aws.amazon.com/new/?nc1=f_cc" target="_blank" rel="noopener">What's New</a></li> 
+        <li><a href="https://aws.amazon.com/blogs/?nc1=f_cc" target="_blank" rel="noopener">Blogs</a></li> 
+        <li><a href="https://press.aboutamazon.com/press-releases/aws" target="_blank" rel="noopener" title="Press Releases">Press Releases</a></li> 
+       </ul> 
+      </div> 
+      <div class="lb-xbcol"> 
+       <h3 id="Resources_for_AWS" class="lb-txt-none lb-txt-p-chromium lb-tiny-v-margin lb-h3 lb-title"> Resources for AWS</h3> 
+       <ul class="lb-txt-p-chromium lb-ul lb-list-style-none lb-li-micro-v-margin lb-tiny-ul-block" style="margin-bottom:0px;"> 
+        <li><a href="https://aws.amazon.com/getting-started/?nc1=f_cc" target="_blank" rel="noopener">Getting Started</a></li> 
+        <li><a href="https://aws.amazon.com/training/?nc1=f_cc" target="_blank" rel="noopener">Training and Certification</a></li> 
+        <li><a href="https://aws.amazon.com/solutions/?nc1=f_cc" target="_blank" rel="noopener">AWS Solutions Portfolio</a></li> 
+        <li><a href="https://aws.amazon.com/architecture/?nc1=f_cc" target="_blank" rel="noopener">Architecture Center</a></li> 
+        <li><a href="https://aws.amazon.com/faqs/?nc1=f_dr" target="_blank" rel="noopener">Product and Technical FAQs</a></li> 
+        <li><a href="https://aws.amazon.com/resources/analyst-reports/?nc1=f_cc" target="_blank" rel="noopener">Analyst Reports</a></li> 
+        <li><a href="https://aws.amazon.com/partners/?nc1=f_dr" target="_blank" rel="noopener">AWS Partner Network</a></li> 
+       </ul> 
+      </div> 
+      <div class="lb-xbcol"> 
+       <h3 id="Developers_on_AWS" class="lb-txt-none lb-txt-p-chromium lb-tiny-v-margin lb-h3 lb-title"> Developers on AWS</h3> 
+       <ul class="lb-txt-p-chromium lb-ul lb-list-style-none lb-li-micro-v-margin lb-tiny-ul-block" style="margin-bottom:0px;"> 
+        <li><a href="https://aws.amazon.com/developer/?nc1=f_dr" target="_blank" rel="noopener">Developer Center</a></li> 
+        <li><a href="https://aws.amazon.com/developer/tools/?nc1=f_dr" target="_blank" rel="noopener">SDKs &amp; Tools</a></li> 
+        <li><a href="https://aws.amazon.com/developer/language/net/?nc1=f_dr" target="_blank" rel="noopener">.NET on AWS</a></li> 
+        <li><a href="https://aws.amazon.com/developer/language/python/?nc1=f_dr" target="_blank" rel="noopener">Python on AWS</a></li> 
+        <li><a href="https://aws.amazon.com/developer/language/java/?nc1=f_dr" target="_blank" rel="noopener">Java on AWS</a></li> 
+        <li><a href="https://aws.amazon.com/developer/language/php/?nc1=f_cc" target="_blank" rel="noopener">PHP on AWS</a></li> 
+        <li><a href="https://aws.amazon.com/developer/language/javascript/?nc1=f_dr" target="_blank" rel="noopener">JavaScript on AWS</a></li> 
+       </ul> 
+      </div> 
+      <div class="lb-xbcol"> 
+       <h3 id="Help" class="lb-txt-none lb-txt-p-chromium lb-tiny-v-margin lb-h3 lb-title"> Help</h3> 
+       <ul class="lb-txt-p-chromium lb-ul lb-list-style-none lb-li-micro-v-margin lb-tiny-ul-block" style="margin-bottom:0px;"> 
+        <li><a href="https://aws.amazon.com/contact-us/?nc1=f_m" target="_blank" rel="noopener">Contact Us</a></li> 
+        <li><a href="https://www.amazon.jobs/aws" target="_blank" rel="noopener">AWS Careers</a></li> 
+        <li><a href="https://console.aws.amazon.com/support/home/?nc1=f_dr" target="_blank" rel="noopener">File a Support Ticket</a></li> 
+        <li><a href="https://aws.amazon.com/premiumsupport/knowledge-center/?nc1=f_dr" target="_blank" rel="noopener">Knowledge Center</a></li> 
+        <li><a href="https://repost.aws/?nc1=f_dr" target="_blank" rel="noopener">AWS re:Post</a></li> 
+        <li><a href="https://aws.amazon.com/premiumsupport/?nc1=f_dr" target="_blank" rel="noopener">AWS Support Overview</a></li> 
+        <li><a href="https://aws.amazon.com/legal/?nc1=f_cc" target="_blank" rel="noopener">Legal</a></li> 
+       </ul> 
+       <div class="lb-mbox js-mbox" data-lb-comp="mbox" data-lb-comp-ignore="true" data-mbox="en_footer-v3_addl-help"> 
+       </div> 
+      </div> 
+      <div class="lb-xbcol"> 
+       <div class="lb-mbox js-mbox" data-lb-comp="mbox" data-lb-comp-ignore="true" data-mbox="en_footer-v3_cta"> 
+        <div class="data-attr-wrapper lb-tiny-hide lb-small-show lb-btn" data-da-type="so" data-da-so-type="viewport" data-da-so-language="en" data-da-so-category="monitoring" data-da-so-name="footer_buttons" data-da-so-url="all" data-da-so-version="footer_signup-default"> 
+         <a class="lb-btn-p-primary" href="https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc1=f_ct&amp;src=default" role="button"> <span> Create an AWS Account</span> </a> 
+        </div> 
+       </div> 
+       <div class="lb-xb-grid-wrap" style="padding-left:0px; margin-top:20px;"> 
+        <div class="lb-xb-grid lb-row-max-large lb-xb-equal-height lb-snap lb-gutter-collapse lb-vgutter-collapse lb-tiny-xb-auto"> 
+         <div class="lb-xbcol"> 
+          <a class="lb-txt-none lb-txt-p-chromium lb-none-pad lb-txt" style="padding-left:0px; padding-right:5px;" href="https://twitter.com/awscloud" target="_blank" rel="noopener" title="Twitter"> <i class="icon-twitter"></i></a> 
+         </div> 
+         <div class="lb-xbcol"> 
+          <a class="lb-txt-none lb-txt-p-chromium lb-none-pad lb-none-v-margin lb-txt" style="padding-right:5px;" href="https://www.facebook.com/amazonwebservices" target="_blank" rel="noopener" title="Facebook"> <i class="icon-facebook"></i></a> 
+         </div> 
+         <div class="lb-xbcol"> 
+          <a class="lb-txt-none lb-txt-p-chromium lb-none-pad lb-txt" style="padding-right:5px;" href="https://www.twitch.tv/aws" target="_blank" rel="noopener" title="Twitch"> <i class="icon-twitch"></i></a> 
+         </div> 
+         <div class="lb-xbcol"> 
+          <a class="lb-txt-none lb-txt-p-chromium lb-none-pad lb-txt" style="padding-right:5px;" href="https://www.youtube.com/user/AmazonWebServices/Cloud/" target="_blank" rel="noopener" title="YouTube"> <i class="icon-youtube"></i></a> 
+         </div> 
+         <div class="lb-xbcol"> 
+          <a class="lb-txt-none lb-txt-p-chromium lb-none-pad lb-txt" style="padding-right:5px;" href="https://aws.amazon.com/podcasts/" target="_blank" rel="noopener" title="Podcast"> <i class="icon-podcast"></i></a> 
+         </div> 
+         <div class="lb-xbcol"> 
+          <a class="lb-txt-none lb-txt-p-chromium lb-none-pad lb-txt" style="padding-right:5px;" href="https://pages.awscloud.com/communication-preferences?trk=homepage" target="_blank" rel="noopener" title="Email"> <i class="icon-envelope-o"></i></a> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="lb-txt-normal lb-txt-white lb-txt-14 lb-rtxt" style="color:#eaeded; margin-top:0px;"> 
+        <div>
+          Amazon is an Equal Opportunity Employer: 
+         <i> Minority / Women / Disability / Veteran / Gender Identity / Sexual Orientation / Age.</i> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="lb-none-pad lb-none-v-margin lb-xb-grid-wrap" style="background-color:#242F3E;"> 
+     <div class="lb-xb-grid lb-row-max-large lb-snap lb-tiny-xb-1"> 
+      <div class="lb-xbcol"> 
+       <ul class="lb-txt-p-chromium lb-tiny-iblock lb-none-v-margin lb-ul lb-list-style-none lb-li-micro-v-margin lb-tiny-ul-iblock"> 
+        <li class="lb-txt-bold">Language</li> 
+        <li data-language="ar"><a href="https://aws.amazon.com/ar/?nc1=h_ls">عربي</a></li> 
+        <li data-language="id"><a href="https://aws.amazon.com/id/?nc1=h_ls">Bahasa Indonesia</a></li> 
+        <li data-language="de"><a href="https://aws.amazon.com/de/?nc1=h_ls">Deutsch</a></li> 
+        <li data-language="en"><a href="https://aws.amazon.com/?nc1=h_ls">English</a></li> 
+        <li data-language="es"><a href="https://aws.amazon.com/es/?nc1=h_ls">Español</a></li> 
+        <li data-language="fr"><a href="https://aws.amazon.com/fr/?nc1=h_ls">Français</a></li> 
+        <li data-language="it"><a href="https://aws.amazon.com/it/?nc1=h_ls">Italiano</a></li> 
+        <li data-language="pt"><a href="https://aws.amazon.com/pt/?nc1=h_ls">Português</a></li> 
+        <li data-language="vi"><a href="https://aws.amazon.com/vi/?nc1=f_ls">Tiếng Việt</a></li> 
+        <li data-language="tr"><a href="https://aws.amazon.com/tr/?nc1=h_ls">Türkçe</a></li> 
+        <li data-language="ru"><a href="https://aws.amazon.com/ru/?nc1=h_ls">Ρусский</a></li> 
+        <li data-language="th"><a href="https://aws.amazon.com/th/?nc1=f_ls">ไทย</a></li> 
+        <li data-language="jp"><a href="https://aws.amazon.com/jp/?nc1=h_ls">日本語</a></li> 
+        <li data-language="ko"><a href="https://aws.amazon.com/ko/?nc1=h_ls">한국어</a></li> 
+        <li data-language="cn"><a href="https://aws.amazon.com/cn/?nc1=h_ls">中文 (简体)</a></li> 
+        <li data-language="tw"><a href="https://aws.amazon.com/tw/?nc1=h_ls">中文 (繁體)</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="lb-none-pad lb-none-v-margin lb-xb-grid-wrap" style="background-color:#EAEDED; padding-top:5px;"> 
+     <div class="lb-xb-grid lb-row-max-large lb-snap lb-tiny-xb-1"> 
+      <div class="lb-xbcol"> 
+       <ul class="lb-txt-p-squid-ink lb-none-v-margin lb-ul lb-list-style-none lb-li-none-v-margin lb-tiny-ul-iblock"> 
+        <li><a href="https://aws.amazon.com/privacy/?nc1=f_pr">Privacy</a></li> 
+        <li>|</li> 
+        <li><a href="https://aws.amazon.com/terms/?nc1=f_pr">Site Terms</a></li> 
+        <li>|</li> 
+        <li data-cookie-consent-modal="1"><a href="#"> Cookie Preferences </a></li> 
+        <li>|</li> 
+        <li>© 2022, Amazon Web Services, Inc. or its affiliates. All rights reserved.</li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+   </footer> 
+  </div> 
+  <script data-disqus-cookies-disabled-dialog type="text/html">
+  <div class="lb-alert lb-alert-info">
+    <h4 class="lb-title">Feature not available</h4>
+
+    <p>Visit <a href="#" data-shortbread-modal="true">cookie preferences</a> and allow all cookies to enable this feature.</p>
+  </div>
+</script> 
+  <div id="aws-page-end"></div> 
+  <div id="lb-page-end"></div> 
+  <script src="//a0.awsstatic.com/da/js/1.0.48/aws-da.js" async></script> 
+  <script src="//a0.awsstatic.com/aws-blog/1.0.49/js/vendor/prism.js" data-default-language="markup"></script>  
+ </body>
+</html>
